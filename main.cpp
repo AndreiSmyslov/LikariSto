@@ -2,9 +2,10 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <memory>
+#include "Potworki.h"
 #include <iostream>
 
-
+void wczytajProstokaty(std::vector<std::unique_ptr<sf::Drawable>> &ksztalty);
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(900, 900), "DR. Mario");
@@ -18,6 +19,7 @@ int main() {
         return EXIT_FAILURE;
     }
     sf::Clock clock;
+    sf::Clock clock2;
 
     int etapGry = 1; // 1 - ekran poczatkowy z wyborem ustawien, 2 - ekran gry, 3 - ekran koncowy z wynikiem
     int poziomTrudnosci=0;
@@ -29,53 +31,98 @@ int main() {
 
 
     sf::Texture doktor1;
-    if (!doktor1.loadFromFile("doktor1.png")) {
+    if (!doktor1.loadFromFile("tekstury/doktor1.png")) {
         std::cerr << "Błąd podczas wczytywania tekstury 1." << std::endl;
         return -1;
     }
 
     sf::Texture doktor2;
-    if (!doktor2.loadFromFile("doktor2.png")) {
+    if (!doktor2.loadFromFile("tekstury/doktor2.png")) {
         std::cerr << "Błąd podczas wczytywania tekstury 2." << std::endl;
         return -1;
     }
 
     sf::Texture doktor3;
-    if (!doktor3.loadFromFile("doktor3.png")) {
+    if (!doktor3.loadFromFile("tekstury/doktor3.png")) {
         std::cerr << "Błąd podczas wczytywania tekstury 3." << std::endl;
         return -1;
     }
 
     sf::Texture doktor4;
-    if (!doktor4.loadFromFile("doktor4.png")) {
+    if (!doktor4.loadFromFile("tekstury/doktor4.png")) {
         std::cerr << "Błąd podczas wczytywania tekstury 4." << std::endl;
         return -1;
     }
 
     sf::Texture doktor5;
-    if (!doktor5.loadFromFile("doktor5.png")) {
+    if (!doktor5.loadFromFile("tekstury/doktor5.png")) {
         std::cerr << "Błąd podczas wczytywania tekstury 5." << std::endl;
         return -1;
     }
 
     sf::Sprite doktorNoga;
     doktorNoga.setTexture(doktor1);
-    doktorNoga.setPosition(380, 60);
+    doktorNoga.setPosition(700, 200);
 
     sf::Sprite doktorRzut;
     doktorRzut.setTexture(doktor3);
-    doktorRzut.setPosition(380, 60);
+    doktorRzut.setPosition(700, 200);
 
     sf::Texture tlo1;
-        if (!tlo1.loadFromFile("tlo1.jpg")) {
+        if (!tlo1.loadFromFile("tekstury/tlo1.jpg")) {
             std::cerr << "Could not load texture" << std::endl;
             return 1;
         }
 
     sf::Texture tlo2;
-    if (!tlo2.loadFromFile("tlo2.jpg")) {
+    if (!tlo2.loadFromFile("tekstury/tlo2.jpg")) {
         std::cerr << "Could not load texture" << std::endl;
         return 1;
+    }
+
+    sf::Texture butelka;
+    if (!butelka.loadFromFile("tekstury/butelka.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+        return 1;
+    }
+
+    sf::Texture zolty;
+    if (!zolty.loadFromFile("tekstury/potworekZolty1.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+    }
+    sf::Texture zielony;
+    if (!zielony.loadFromFile("tekstury/potworekZielony1.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+    }
+    sf::Texture fioletowy;
+    if (!fioletowy.loadFromFile("tekstury/potworekFioletowy1.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+    }
+    sf::Texture zolty1;
+    if (!zolty1.loadFromFile("tekstury/potworekZolty2.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+    }
+    sf::Texture zielony1;
+    if (!zielony1.loadFromFile("tekstury/potworekZielony2.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+    }
+    sf::Texture fioletowy1;
+    if (!fioletowy1.loadFromFile("tekstury/potworekFioletowy2.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+    }
+
+    std::vector<Potworki> potworki;
+    for(int i=0; i<20; i++)
+    {
+        Potworki p1;
+        int kolor=rand()%3+1;
+        if(kolor==1)
+            p1.setTexture(fioletowy);
+        if(kolor==2)
+            p1.setTexture(zielony);
+        if(kolor==3)
+            p1.setTexture(zolty);
+        potworki.emplace_back(p1);
     }
 
     while (window.isOpen()) {
@@ -145,36 +192,22 @@ int main() {
 
             // Tworzenie kształtów, tekstów i dodawanie ich do wektora:
 
-                tlo1.setRepeated(true);
-                sf::Sprite sprite;
-                sprite.setTexture(tlo1);
-                //sprite.setScale(0.3, 0.3);
-                sprite.setTextureRect(sf::IntRect(0, 0, 900, 900));
-                wszystkieKsztalty.emplace_back(std::make_unique<sf::Sprite>(sprite));
+            tlo1.setRepeated(true);
+            sf::Sprite sprite;
+            sprite.setTexture(tlo1);
+            //sprite.setScale(0.3, 0.3);
+            sprite.setTextureRect(sf::IntRect(0, 0, 900, 900));
+            wszystkieKsztalty.emplace_back(std::make_unique<sf::Sprite>(sprite));
 
-            sf::RectangleShape prostokat1(sf::Vector2f(145.0, 45.0));
-            prostokat1.setPosition(200.0, 460.0);
-            prostokat1.setFillColor(sf::Color::Green);
-            wszystkieKsztalty.emplace_back(std::make_unique<sf::RectangleShape>(prostokat1));
+            wczytajProstokaty(wszystkieKsztalty);
 
-            sf::RectangleShape prostokat2(sf::Vector2f(170.0, 45.0));
-            prostokat2.setPosition(345.0, 460.0);
-            prostokat2.setFillColor(sf::Color::Blue);
-            wszystkieKsztalty.emplace_back(std::make_unique<sf::RectangleShape>(prostokat2));
+            sf::Text tryb(L"Ilość Wirusów:", czcionka, 30);
+            tryb.setPosition(210.f, 230.f);
+            wszystkieKsztalty.emplace_back(std::make_unique<sf::Text>(tryb));
 
-            sf::RectangleShape prostokat3(sf::Vector2f(170.0, 45.0));
-            prostokat3.setPosition(515.0, 460.0);
-            prostokat3.setFillColor(sf::Color::Red);
-            wszystkieKsztalty.emplace_back(std::make_unique<sf::RectangleShape>(prostokat3));
-
-            sf::RectangleShape track(sf::Vector2f(400, 10));
-            track.setFillColor(sf::Color::White);
-            track.setPosition(200, 300);
-            wszystkieKsztalty.emplace_back(std::make_unique<sf::RectangleShape>(track));
-
-            sf::RectangleShape slider(sf::Vector2f(20, 40));
-            slider.setFillColor(sf::Color::Red);
-            slider.setPosition(pozycjaSuwakX, pozycjaSuwakY);
+            sf::Text szybkosc(L"Tryb gry:", czcionka, 30);
+            szybkosc.setPosition(210.f, 390.f);
+            wszystkieKsztalty.emplace_back(std::make_unique<sf::Text>(szybkosc));
 
             sf::Text tytul("Dr. Mario", czcionka, 70);
             tytul.setPosition(250.f, 60.f);
@@ -184,13 +217,9 @@ int main() {
             tytul.setOutlineThickness(5);
             wszystkieKsztalty.emplace_back(std::make_unique<sf::Text>(tytul));
 
-            sf::Text tryb(L"Ilość Wirusów:", czcionka, 30);
-            tryb.setPosition(210.f, 230.f);
-            wszystkieKsztalty.emplace_back(std::make_unique<sf::Text>(tryb));
-
-            sf::Text szybkosc(L"Tryb gry:", czcionka, 30);
-            szybkosc.setPosition(210.f, 390.f);
-            wszystkieKsztalty.emplace_back(std::make_unique<sf::Text>(szybkosc));
+            sf::RectangleShape slider(sf::Vector2f(20, 40));
+            slider.setFillColor(sf::Color::Red);
+            slider.setPosition(pozycjaSuwakX, pozycjaSuwakY);
 
             sf::Text tryby(L"1. Tryb łatwy  2. Tryb średni  3. Tryb trudny", czcionka, 24);
             tryby.setPosition(200.f, 465.f);
@@ -241,11 +270,6 @@ int main() {
             ilosc.setPosition(460.f, 230.f);
             wszystkieKsztalty.emplace_back(std::make_unique<sf::Text>(ilosc));
 
-            sf::RectangleShape przyciskGraj(sf::Vector2f(170, 80));
-            przyciskGraj.setFillColor(sf::Color::Red);
-            przyciskGraj.setPosition(550, 590);
-            wszystkieKsztalty.emplace_back(std::make_unique<sf::RectangleShape>(przyciskGraj));
-
             sf::Text graj(L"GRAJ", czcionka, 45);
             graj.setPosition(570.f, 600.f);
             graj.setFillColor(sf::Color::Yellow);
@@ -263,13 +287,52 @@ int main() {
         if(etapGry==2)
         {
             std::vector<std::unique_ptr<sf::Drawable>> shapes;
-
             tlo2.setRepeated(true);
             sf::Sprite sprite;
             sprite.setTexture(tlo2);
             //sprite.setScale(0.3, 0.3);
             sprite.setTextureRect(sf::IntRect(0, 0, 900, 900));
             shapes.emplace_back(std::make_unique<sf::Sprite>(sprite));
+
+            sf::Sprite butla;
+            butla.setTexture(butelka);
+            //butla.setTextureRect(sf::IntRect(0, 0, 320, 700));
+            butla.setPosition(300, 170);
+            shapes.emplace_back(std::make_unique<sf::Sprite>(butla));
+
+            sf::Time animationTime2 = sf::seconds(0.6f);
+            sf::Time elapsed2 = clock2.getElapsedTime();
+
+            // Sprawdź, czy przekroczono czas animacji
+            if (elapsed2 >= animationTime2)
+            {
+                // Iteruj przez wszystkie obiekty
+                for (int i = 0; i < value; i++)
+                {
+                    if (potworki[i].getTexture() == &zolty)
+                        potworki[i].setTexture(zolty1);
+                    else if (potworki[i].getTexture() == &fioletowy)
+                        potworki[i].setTexture(fioletowy1);
+                    else if (potworki[i].getTexture() == &zielony)
+                        potworki[i].setTexture(zielony1);
+                    else if (potworki[i].getTexture() == &fioletowy1)
+                        potworki[i].setTexture(fioletowy);
+                    else if (potworki[i].getTexture() == &zielony1)
+                        potworki[i].setTexture(zielony);
+                    else if (potworki[i].getTexture() == &zolty1)
+                        potworki[i].setTexture(zolty);
+                }
+
+                // Restart zegara
+                clock2.restart();
+            }
+
+            // Dodaj obiekty do shapes
+            for (int i = 0; i < value; i++)
+            {
+                shapes.emplace_back(std::make_unique<Potworki>(potworki[i]));
+            }
+
 
             if(gra)
             {
@@ -284,7 +347,8 @@ int main() {
                         doktorRzut.setTexture(doktor4);
 
                     else if (doktorRzut.getTexture() == &doktor5)
-                        doktorRzut.setTexture(doktor3);
+                        gra=false;
+                        //doktorRzut.setTexture(doktor3);
 
                     else
                         doktorRzut.setTexture(doktor5);
@@ -321,4 +385,33 @@ int main() {
     }
 
     return 0;
+}
+
+
+void wczytajProstokaty(std::vector<std::unique_ptr<sf::Drawable>> &ksztalty)
+{
+    sf::RectangleShape prostokat1(sf::Vector2f(145.0, 45.0));
+    prostokat1.setPosition(200.0, 460.0);
+    prostokat1.setFillColor(sf::Color::Green);
+    ksztalty.emplace_back(std::make_unique<sf::RectangleShape>(prostokat1));
+
+    sf::RectangleShape prostokat2(sf::Vector2f(170.0, 45.0));
+    prostokat2.setPosition(345.0, 460.0);
+    prostokat2.setFillColor(sf::Color::Blue);
+    ksztalty.emplace_back(std::make_unique<sf::RectangleShape>(prostokat2));
+
+    sf::RectangleShape prostokat3(sf::Vector2f(170.0, 45.0));
+    prostokat3.setPosition(515.0, 460.0);
+    prostokat3.setFillColor(sf::Color::Red);
+    ksztalty.emplace_back(std::make_unique<sf::RectangleShape>(prostokat3));
+
+    sf::RectangleShape track(sf::Vector2f(400, 10));
+    track.setFillColor(sf::Color::White);
+    track.setPosition(200, 300);
+    ksztalty.emplace_back(std::make_unique<sf::RectangleShape>(track));
+
+    sf::RectangleShape przyciskGraj(sf::Vector2f(170, 80));
+    przyciskGraj.setFillColor(sf::Color::Red);
+    przyciskGraj.setPosition(550, 590);
+    ksztalty.emplace_back(std::make_unique<sf::RectangleShape>(przyciskGraj));
 }

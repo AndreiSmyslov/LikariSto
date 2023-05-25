@@ -10,4 +10,8 @@ CONFIG(debug, debug|release){
     LIBS += -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window
 }
 SOURCES += \
-        main.cpp
+        main.cpp \
+        potworki.cpp
+
+HEADERS += \
+    potworki.h
