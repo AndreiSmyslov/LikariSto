@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include "Potworki.h"
+#include "bloczek.h"
 #include <iostream>
 
 void wczytajProstokaty(std::vector<std::unique_ptr<sf::Drawable>> &ksztalty);
@@ -20,11 +21,13 @@ int main() {
     }
     sf::Clock clock;
     sf::Clock clock2;
+    sf::Clock clock3;
 
     int etapGry = 1; // 1 - ekran poczatkowy z wyborem ustawien, 2 - ekran gry, 3 - ekran koncowy z wynikiem
     int poziomTrudnosci=0;
     bool suwak = false;
     bool gra = true;
+    bool rzut = true;
     int value = 1;
     int pozycjaSuwakX = 200;
     int pozycjaSuwakY = 290;
@@ -111,19 +114,71 @@ int main() {
         std::cerr << "Could not load texture" << std::endl;
     }
 
-    std::vector<Potworki> potworki;
-    for(int i=0; i<20; i++)
-    {
-        Potworki p1;
-        int kolor=rand()%3+1;
-        if(kolor==1)
-            p1.setTexture(fioletowy);
-        if(kolor==2)
-            p1.setTexture(zielony);
-        if(kolor==3)
-            p1.setTexture(zolty);
-        potworki.emplace_back(p1);
+
+    // tekstury bloczków:
+    std::vector <sf::Texture> wektorTekstur;
+
+    sf::Texture fioletowyZielony;
+    if (!fioletowyZielony.loadFromFile("tekstury/fioletowyZielony.png")) {
+        std::cerr << "Could not load texture" << std::endl;
     }
+    wektorTekstur.emplace_back(fioletowyZielony);
+
+    sf::Texture fioletowy2;
+    if (!fioletowy2.loadFromFile("tekstury/fioletowy2.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+    }
+    wektorTekstur.emplace_back(fioletowy2);
+
+
+    sf::Texture fioletowyZolty;
+    if (!fioletowyZolty.loadFromFile("tekstury/fioletowyZolty.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+    }
+    wektorTekstur.emplace_back(fioletowyZolty);
+
+    sf::Texture zielony2;
+    if (!zielony2.loadFromFile("tekstury/zielony2.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+    }
+    wektorTekstur.emplace_back(zielony2);
+
+    sf::Texture zielonyFioletowy;
+    if (!zielonyFioletowy.loadFromFile("tekstury/zielonyFioletowy.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+    }
+    wektorTekstur.emplace_back(zielonyFioletowy);
+
+    sf::Texture zielonyZolty;
+    if (!zielonyZolty.loadFromFile("tekstury/zielonyZolty.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+    }
+    wektorTekstur.emplace_back(zielonyZolty);
+
+    sf::Texture zolty2;
+    if (!zolty2.loadFromFile("tekstury/zolty2.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+    }
+    wektorTekstur.emplace_back(zolty2);
+
+    sf::Texture zoltyFioletowy;
+    if (!zoltyFioletowy.loadFromFile("tekstury/zoltyFioletowy.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+    }
+    wektorTekstur.emplace_back(zoltyFioletowy);
+
+    sf::Texture zoltyZielony;
+    if (!zoltyZielony.loadFromFile("tekstury/zoltyZielony.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+    }
+    wektorTekstur.emplace_back(zoltyZielony);
+
+    std::vector<Potworki> potworki;
+    std::vector<Bloczek> wektorBloczkow;
+
+//    //stworzenie bloczka:
+//    Bloczek bloczek;
+//    bloczek.setTexture(wektorTekstur[rand()%9+1]);
 
     while (window.isOpen()) {
 
@@ -171,6 +226,19 @@ int main() {
                 sf::RectangleShape przyciskGraj(sf::Vector2f(170, 80));
                 przyciskGraj.setPosition(550, 590);
                 if ((przyciskGraj.getGlobalBounds().contains(mousePosition)) && (poziomTrudnosci!=0)) {
+                    // tworzenie potworków i dodanie ich do wektora:
+                    for(int i=0; i<value; i++)
+                    {
+                        Potworki p1;
+                        int kolor=rand()%3+1;
+                        if(kolor==1)
+                            p1.setTexture(fioletowy);
+                        if(kolor==2)
+                            p1.setTexture(zielony);
+                        if(kolor==3)
+                            p1.setTexture(zolty);
+                        potworki.emplace_back(p1);
+                    }
                     etapGry=2;
                 }
 
@@ -322,8 +390,6 @@ int main() {
                     else if (potworki[i].getTexture() == &zolty1)
                         potworki[i].setTexture(zolty);
                 }
-
-                // Restart zegara
                 clock2.restart();
             }
 
@@ -332,8 +398,6 @@ int main() {
             {
                 shapes.emplace_back(std::make_unique<Potworki>(potworki[i]));
             }
-
-
             if(gra)
             {
                 // Czas animacji i opóźnienie między klatkami
@@ -355,6 +419,7 @@ int main() {
                     clock.restart();
                 }
                 shapes.emplace_back(std::make_unique<sf::Sprite>(doktorRzut));
+
             }
             else
             {
@@ -374,12 +439,34 @@ int main() {
                 shapes.emplace_back(std::make_unique<sf::Sprite>(doktorNoga));
 
             }
+            int f=0;
+            for(auto it = wektorBloczkow.begin(); it!=wektorBloczkow.end(); it++)
+            {
+                if(it->szybkosc()!=sf::Vector2f(0.0f, 0.0f))
+                {
+                    f++;
+                }
+            }
+            if(f==0)
+            {
+                Bloczek bloczek(sf::Vector2f(0.0, -1.0));
+                bloczek.setTexture(wektorTekstur[rand()%9+1]);
+                wektorBloczkow.emplace_back(bloczek);
+                rzut=true;
+            }
+            if(rzut)
+            {
+                // Tutaj trzeba nadac ruch paraboliczny w zaleznosci od zmiennej t
+                // ...
+                sf::Time t = clock3.getElapsedTime();
+                wektorBloczkow[wektorBloczkow.size()-1].move(sf::Vector2f(-2.0, -1.0));
+            }
+            shapes.emplace_back(std::make_unique<Bloczek>(wektorBloczkow[wektorBloczkow.size()-1]));
 
             window.clear(sf::Color::Black);
             for(const auto &s : shapes) {
                 window.draw(*s);
             }
-
             window.display();
         }
     }
