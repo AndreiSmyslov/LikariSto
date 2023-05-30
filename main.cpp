@@ -22,15 +22,18 @@ int main() {
     sf::Clock clock;
     sf::Clock clock2;
     sf::Clock clock3;
+    sf::Clock clock4;
 
     int etapGry = 1; // 1 - ekran poczatkowy z wyborem ustawien, 2 - ekran gry, 3 - ekran koncowy z wynikiem
     int poziomTrudnosci=0;
     bool suwak = false;
     bool gra = true;
     bool rzut = true;
+    bool zaczynamy = false;
     int value = 1;
     int pozycjaSuwakX = 200;
-    int pozycjaSuwakY = 290;
+    int pozycjaSuwakY = 286;
+    int a=0;
 
 
     sf::Texture doktor1;
@@ -180,6 +183,7 @@ int main() {
 //    Bloczek bloczek;
 //    bloczek.setTexture(wektorTekstur[rand()%9+1]);
 
+    clock4.restart();
     while (window.isOpen()) {
 
         /* Sprawdzenie Eventów: *******************************************************/
@@ -327,9 +331,8 @@ int main() {
                     mouseX = 600;
 
                 value = (mouseX - 200) / 21 + 1; // Zmiana pozycji myszy na wartość suwaka (1-20)
-                slider.setPosition(mouseX, 290);
+                slider.setPosition(mouseX, pozycjaSuwakY);
                 pozycjaSuwakX=mouseX;
-                pozycjaSuwakY=290;
             }
             wszystkieKsztalty.emplace_back(std::make_unique<sf::RectangleShape>(slider));
 
@@ -398,30 +401,26 @@ int main() {
             {
                 shapes.emplace_back(std::make_unique<Potworki>(potworki[i]));
             }
-            if(gra)
+            sf::Time czasPrzygotowania = sf::seconds(4.0f);
+            sf::Time czas = clock4.getElapsedTime();
+
+            if(czas>=czasPrzygotowania)
             {
-                // Czas animacji i opóźnienie między klatkami
-                sf::Time animationTime = sf::seconds(0.6f);
-                sf::Time elapsed = clock.getElapsedTime();
-
-                // Przełączanie między teksturami co określony czas
-                if (elapsed >= animationTime)
+                if(czas<sf::seconds(6.0f))
                 {
-                    if (doktorRzut.getTexture() == &doktor3)
-                        doktorRzut.setTexture(doktor4);
-
-                    else if (doktorRzut.getTexture() == &doktor5)
-                        gra=false;
-                        //doktorRzut.setTexture(doktor3);
-
-                    else
-                        doktorRzut.setTexture(doktor5);
-                    clock.restart();
+                    sf::Text start(L"Start", czcionka, 30);
+                    start.setPosition(440.f, 390.f);
+                    shapes.emplace_back(std::make_unique<sf::Text>(start));
                 }
-                shapes.emplace_back(std::make_unique<sf::Sprite>(doktorRzut));
+                if(czas>sf::seconds(7.0f))
+                {
+                    zaczynamy=true;
+                }
 
             }
             else
+                zaczynamy=false;
+            if(zaczynamy == false)
             {
                 // Czas animacji i opóźnienie między klatkami
                 sf::Time animationTime = sf::seconds(0.6f);
@@ -437,31 +436,88 @@ int main() {
                     clock.restart();
                 }
                 shapes.emplace_back(std::make_unique<sf::Sprite>(doktorNoga));
+            }
+
+            if(zaczynamy == true)
+            {
+                if(gra)
+                {
+                    // Czas animacji i opóźnienie między klatkami
+                    sf::Time animationTime = sf::seconds(0.6f);
+                    sf::Time elapsed = clock.getElapsedTime();
+
+                    // Przełączanie między teksturami co określony czas
+                    if (elapsed >= animationTime)
+                    {
+                        if (doktorRzut.getTexture() == &doktor3)
+                            doktorRzut.setTexture(doktor4);
+
+                        else if (doktorRzut.getTexture() == &doktor5)
+                            gra=false;
+
+                        else
+                            doktorRzut.setTexture(doktor5);
+                        clock.restart();
+                    }
+                    shapes.emplace_back(std::make_unique<sf::Sprite>(doktorRzut));
+
+                }
+                else
+                {
+                    // Czas animacji i opóźnienie między klatkami
+                    sf::Time animationTime = sf::seconds(0.6f);
+                    sf::Time elapsed = clock.getElapsedTime();
+
+                    // Przełączanie między teksturami co określony czas
+                    if (elapsed >= animationTime)
+                    {
+                        if (doktorNoga.getTexture() == &doktor1)
+                            doktorNoga.setTexture(doktor2);
+                        else
+                            doktorNoga.setTexture(doktor1);
+                        clock.restart();
+                    }
+                    shapes.emplace_back(std::make_unique<sf::Sprite>(doktorNoga));
+
+                }
+                int predkoscBloczka=0;
+                for(auto it = wektorBloczkow.begin(); it!=wektorBloczkow.end(); it++)
+                {
+                    if(it->szybkosc()!=sf::Vector2f(0.0f, 0.0f))
+                    {
+                        predkoscBloczka++;
+                    }
+                }
+                if(predkoscBloczka==0)
+                {
+                    // Jeżeli żaden z bloczków, nie rusza się, można stworzyć kolejny bloczek i nadać mu ruch
+                    Bloczek bloczek(sf::Vector2f(0.0, 0.0));
+                    bloczek.setTexture(wektorTekstur[rand()%9+1]);
+                    wektorBloczkow.emplace_back(bloczek);
+                    rzut=true;
+                    clock3.restart();
+                }
+                if(rzut)
+                {
+                    sf::Time g = clock3.getElapsedTime();
+                    double t=g.asMilliseconds()/100;
+                    double v_y = -6.7+t*0.81;
+                    double v_x = -3.5+(0.17*t);
+                    wektorBloczkow[wektorBloczkow.size()-1].aktualizujPredkosc(sf::Vector2f(v_x, v_y));
+                    wektorBloczkow[wektorBloczkow.size()-1].move(sf::Vector2f(v_x, v_y));
+                }
+                if((wektorBloczkow[wektorBloczkow.size()-1].szybkosc().x>=-0.4))
+                {
+                    rzut = false;
+                    if(a==0)
+                        wektorBloczkow[wektorBloczkow.size()-1].setPosition(429, 330);
+                    wektorBloczkow[wektorBloczkow.size()-1].move(sf::Vector2f(0.0, 2.0));
+                    wektorBloczkow[wektorBloczkow.size()-1].aktualizujPredkosc(sf::Vector2f(0.0, 2.0));
+                    a++;
+                }
+                shapes.emplace_back(std::make_unique<Bloczek>(wektorBloczkow[wektorBloczkow.size()-1]));
 
             }
-            int f=0;
-            for(auto it = wektorBloczkow.begin(); it!=wektorBloczkow.end(); it++)
-            {
-                if(it->szybkosc()!=sf::Vector2f(0.0f, 0.0f))
-                {
-                    f++;
-                }
-            }
-            if(f==0)
-            {
-                Bloczek bloczek(sf::Vector2f(0.0, -1.0));
-                bloczek.setTexture(wektorTekstur[rand()%9+1]);
-                wektorBloczkow.emplace_back(bloczek);
-                rzut=true;
-            }
-            if(rzut)
-            {
-                // Tutaj trzeba nadac ruch paraboliczny w zaleznosci od zmiennej t
-                // ...
-                sf::Time t = clock3.getElapsedTime();
-                wektorBloczkow[wektorBloczkow.size()-1].move(sf::Vector2f(-2.0, -1.0));
-            }
-            shapes.emplace_back(std::make_unique<Bloczek>(wektorBloczkow[wektorBloczkow.size()-1]));
 
             window.clear(sf::Color::Black);
             for(const auto &s : shapes) {

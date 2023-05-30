@@ -3,7 +3,7 @@
 Bloczek::Bloczek(sf::Vector2f v) : Sprite()
 {
     setScale(0.6f, 0.6f);
-    setPosition(700, 250);
+    setPosition(660, 250);
     predkosc =v;
     move(v);
 }
@@ -11,4 +11,9 @@ Bloczek::Bloczek(sf::Vector2f v) : Sprite()
 sf::Vector2f Bloczek::szybkosc()
 {
     return predkosc;
+}
+
+void Bloczek::aktualizujPredkosc(sf::Vector2f a)
+{
+    predkosc = a;
 }
