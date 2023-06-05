@@ -5,6 +5,8 @@ CONFIG -= qt
 INCLUDEPATH += "C:/Users/mateu/Desktop/infa2/SFML-2.5.1/include"
 
 LIBS += -L"C:/Users/mateu/Desktop/infa2/SFML-2.5.1/lib"
+
+
 CONFIG(debug, debug|release){
     LIBS += -lsfml-audio-d -lsfml-graphics-d -lsfml-network-d -lsfml-system-d -lsfml-window-d
 } else {

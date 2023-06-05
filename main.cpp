@@ -6,6 +6,8 @@
 #include "bloczek.h"
 #include <iostream>
 
+using namespace std;
+
 void wczytajProstokaty(std::vector<std::unique_ptr<sf::Drawable>> &ksztalty);
 
 int main() {
@@ -175,6 +177,25 @@ int main() {
         std::cerr << "Could not load texture" << std::endl;
     }
     wektorTekstur.emplace_back(zoltyZielony);
+
+    sf::RectangleShape granicaTop(sf::Vector2f(400.0, 60.0));
+    granicaTop.setPosition(250.0, 270.0);
+    granicaTop.setFillColor(sf::Color(0, 0, 250, 0));
+    sf::RectangleShape granicaBottom(sf::Vector2f(400.0, 60.0));
+    granicaBottom.setPosition(250.0, 842.0);
+    granicaBottom.setFillColor(sf::Color(250, 0, 0, 0));
+    sf::RectangleShape granicaLeft(sf::Vector2f(33.0, 600.0));
+    granicaLeft.setPosition(300.0, 270.0);
+    granicaLeft.setFillColor(sf::Color(0, 250, 250 , 0));
+    sf::RectangleShape granicaRight(sf::Vector2f(33.0, 600.0));
+    granicaRight.setPosition(588.0, 270.0);
+    granicaRight.setFillColor(sf::Color(250, 0, 250 , 0));
+
+    vector<sf::RectangleShape> granice;
+    granice.emplace_back(granicaTop);
+    granice.emplace_back(granicaBottom);
+    granice.emplace_back(granicaLeft);
+    granice.emplace_back(granicaRight);
 
     std::vector<Potworki> potworki;
     std::vector<Bloczek> wektorBloczkow;
@@ -523,7 +544,13 @@ int main() {
             for(const auto &s : shapes) {
                 window.draw(*s);
             }
+            for(const auto &g : granice) {
+                window.draw(g);
+            }
             window.display();
+
+
+
         }
     }
 
