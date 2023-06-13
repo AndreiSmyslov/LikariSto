@@ -13,8 +13,9 @@ public:
     void przesunPrawo(std::vector<std::vector<int>> Macierz);
     void przesunLewo(std::vector<std::vector<int> > Macierz);
     void nowy();
-    void obrocLewo();
-    void obrocPrawo();
+    void obrocLewo(std::vector<std::vector<int> > Macierz);
+    void obrocPrawo(std::vector<std::vector<int> > Macierz);
+    void Pauza();
 private:
     std::vector<std::vector<int>> wektor;
     int pozycja =3;
@@ -23,6 +24,7 @@ private:
     int numerTekstury1;
     int numerTekstury2;
     int sposobSpadania=1;
+    bool pauza = false;
 
 };
 

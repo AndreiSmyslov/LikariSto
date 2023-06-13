@@ -39,7 +39,7 @@ int main() {
 
 
     // create the window
-    sf::RenderWindow window(sf::VideoMode(900, 900), "Tetris", sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode(900, 900), "Dr. Mario", sf::Style::Close);
 
 
     sf::RectangleShape rectangle(sf::Vector2f(CELL_SIZE*SCREEN_RESIZE-1, CELL_SIZE*SCREEN_RESIZE-1));
@@ -73,10 +73,13 @@ int main() {
                     bloczek.przesunPrawo(Macierz);
                 }
                 if (event.key.code == sf::Keyboard::A) {
-                    bloczek.obrocLewo();
+                    bloczek.obrocLewo(Macierz);
                 }
                 if (event.key.code == sf::Keyboard::D) {
-                    bloczek.obrocPrawo();
+                    bloczek.obrocPrawo(Macierz);
+                }
+                if (event.key.code == sf::Keyboard::Space) {
+                    bloczek.Pauza();
                 }
             }
         }
@@ -86,7 +89,7 @@ int main() {
 
 
         sf::Time czas = clock.getElapsedTime();
-        if(czas.asMilliseconds()>(150))
+        if(czas.asMilliseconds()>(300))
         {
             clock.restart();
             if(bloczek.wypelnijMacierz(macierz, COLUMNS, ROWS, Macierz))
@@ -106,10 +109,22 @@ int main() {
                     window.draw(rectangle);
                 }
 
-                if(macierz[i][j]!=0)
+                if(macierz[i][j]==1)
                 {
                     rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
-                    rectangle.setFillColor(sf::Color(100, 200, 200));
+                    rectangle.setFillColor(sf::Color(0, 0, 200));
+                    window.draw(rectangle);
+                }
+                if(macierz[i][j]==2)
+                {
+                    rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
+                    rectangle.setFillColor(sf::Color(0, 200, 0));
+                    window.draw(rectangle);
+                }
+                if(macierz[i][j]==3)
+                {
+                    rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
+                    rectangle.setFillColor(sf::Color(200, 0, 0));
                     window.draw(rectangle);
                 }
             }
@@ -118,12 +133,30 @@ int main() {
         {
             for(int j=0; j < ROWS; j++)
             {
-                if(Macierz[i][j]!=0)
+                if(Macierz[i][j]==1)
                 {
                     rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
                     rectangle.setFillColor(sf::Color(0, 0, 200));
                     window.draw(rectangle);
                 }
+                if(Macierz[i][j]==2)
+                {
+                    rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
+                    rectangle.setFillColor(sf::Color(0, 200, 0));
+                    window.draw(rectangle);
+                }
+                if(Macierz[i][j]==3)
+                {
+                    rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
+                    rectangle.setFillColor(sf::Color(200, 0, 0));
+                    window.draw(rectangle);
+                }
+//                if(Macierz[i][j]!=0)
+//                {
+//                    rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
+//                    rectangle.setFillColor(sf::Color(0, 0, 200));
+//                    window.draw(rectangle);
+//                }
             }
         }
         window.display();
