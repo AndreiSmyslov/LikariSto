@@ -13,6 +13,9 @@ Bloczek::Bloczek()
 
 bool Bloczek::wypelnijMacierz(std::vector<std::vector<int>> &macierz, int COLUMNS, int ROWS, std::vector<std::vector<int>> Macierz)
 {
+    // Sprawdza czy pauza jest true, jezeli tak, to odejmuje od zmiennej spadanie, tak że spadanie ciagle jest takie samo (na koncu tej funkcji spadanie wzrasta o jeden)
+
+    // Spadanie i pozycja to w pewien sposob takie wspolrzedne w macierzy, ktore pomagaja sie w niej odnalezc, sa wspolrzednymi konkretnego kwadratu lub elementu w macierzy
     if(pauza)
     {
         spadanie--;
@@ -24,6 +27,7 @@ bool Bloczek::wypelnijMacierz(std::vector<std::vector<int>> &macierz, int COLUMN
     {
         for(int j=0; j < ROWS; j++)
         {
+            // Sposob spadania to zmienna mowiaca czy obiekt zostal obrocony i czy jest normalnie czyt na grzbiecie
             if(sposobSpadania==1)
             {
                 if((i == pozycja && j==spadanie))

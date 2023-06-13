@@ -59,7 +59,7 @@ int main() {
         sf::Time time1 = clock.getElapsedTime();
         if (time1.asMilliseconds() > 16.7)
         {
-
+        // Sprawdzanie czy został nacisniety ktorys z klawiszy na klawiaturze
         sf::Event event;
         while (window.pollEvent(event)) {
             // "close requested" event: we close the window
@@ -87,17 +87,21 @@ int main() {
         window.clear(sf::Color::Black);
 
 
-
+        // Animacja bloczka i tworzenie nowego, gdy funkcja zwroci wartosc true, co bedzie rownowazne z tym ze bloczek stanal na czyms
         sf::Time czas = clock.getElapsedTime();
         if(czas.asMilliseconds()>(300))
         {
             clock.restart();
             if(bloczek.wypelnijMacierz(macierz, COLUMNS, ROWS, Macierz))
             {
+                // Dodaje do zmiennej Macierz nowe dwa elementy ktore sa efektem bloczka, ktory dopiero co spaadl
                 Macierz = dodaj_macierze(Macierz, macierz);
+                // Ustawia wszystkie parametry domyslnie
                 bloczek.nowy();
             }
         }
+
+        // Wypelnainie ekranu kwadratami o koloroch zaleznych od liczb z macierzy liczby
         for (int i=0; i< COLUMNS; i++)
         {
             for(int j=0; j < ROWS; j++)
@@ -129,6 +133,8 @@ int main() {
                 }
             }
         }
+
+        // Nalozenie na ekran kwadratow kwadratow ktore juz tam byly i staly juz od wczesniejszych rund
         for (int i=0; i< COLUMNS; i++)
         {
             for(int j=0; j < ROWS; j++)
