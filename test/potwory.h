@@ -10,6 +10,7 @@ class Potwory
 public:
     static std::vector<sf::Vector3f> pozycje;
     Potwory(int liczba);
+    std::vector<std::vector<int>> DodajDoMacierzy(std::vector<std::vector<int>> mac);
 };
 
 #endif // POTWORY_H

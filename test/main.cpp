@@ -1,4 +1,3 @@
-
 #include "potwory.h"
 #include "bloczek.h"
 #include <SFML/Window.hpp>
@@ -54,17 +53,16 @@ int main() {
     //rectangle.setPosition(300, 170);
 
     // inicjalizacja potworow
-    Potwory potwory(88);
+    Potwory potwory(8);
 //    for (auto &potwo : potwory.pozycje)
 //    {
 //        cout << potwo.x << " " << potwo.y << " " << potwo.z << endl;
 //    }
-
-
+    Macierz = potwory.DodajDoMacierzy(Macierz);
 
     sf::Clock clock;
 
-    window.setFramerateLimit(30);
+    window.setFramerateLimit(120);
 
     // run the program as long as the window is open
     while (window.isOpen()) {
@@ -114,11 +112,14 @@ int main() {
         if(czas.asMilliseconds()>(300))
         {
             clock.restart();
+
+            //cout << bloczek.wypelnijMacierz(macierz, COLUMNS, ROWS, Macierz) << endl;
             if(bloczek.wypelnijMacierz(macierz, COLUMNS, ROWS, Macierz))
             {
                 Macierz = dodaj_macierze(Macierz, macierz);
                 bloczek.nowy();
             }
+
         }
         for (int i=0; i< COLUMNS; i++)
         {
@@ -155,19 +156,19 @@ int main() {
         {
             for(int j=0; j < ROWS; j++)
             {
-                sf::Time czas = clock.getElapsedTime();
-                if(czas.asMilliseconds()>(600))
-                {
-                spadanie++;
-                czas = clock.restart();
-                //spadanie=0;
-                }
-                rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
-                if((i == pozycja && j==spadanie) || (i == pozycja+1 && j == spadanie))
-                {
-                rectangle.setFillColor(sf::Color(250, 0, 0));
-                //macierz[i][j] = ;
-                }
+//                sf::Time czas = clock.getElapsedTime();
+//                if(czas.asMilliseconds()>(600))
+//                {
+//                spadanie++;
+//                czas = clock.restart();
+//                //spadanie=0;
+//                }
+//                rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
+//                if((i == pozycja && j==spadanie) || (i == pozycja+1 && j == spadanie))
+//                {
+//                rectangle.setFillColor(sf::Color(250, 0, 0));
+//                //macierz[i][j] = ;
+//                }
                 for (auto &potwo : potwory.pozycje)
                 {
 
@@ -190,8 +191,8 @@ int main() {
 
                 }
 
-                window.draw(rectangle);
-                rectangle.setFillColor(sf::Color(100, 50, 250));
+//                window.draw(rectangle);
+//                rectangle.setFillColor(sf::Color(100, 50, 250));
 
                 if(Macierz[i][j]==1)
                 {
@@ -217,8 +218,9 @@ int main() {
 //                    rectangle.setFillColor(sf::Color(0, 0, 200));
 //                    window.draw(rectangle);
 //                }
-            //}
+            }
         }
+
         window.display();
 
 
@@ -227,6 +229,8 @@ int main() {
 
     return 0;
 }
+
+
 std::vector<std::vector<int>> dodaj_macierze(const std::vector<std::vector<int>>& macierz1, const std::vector<std::vector<int>>& macierz2) {
     // Sprawdzenie wymiarów macierzy
     if (macierz1.size() != macierz2.size() || macierz1[0].size() != macierz2[0].size()) {

@@ -53,3 +53,12 @@ Potwory::Potwory(int liczba)
     }
 
 }
+
+vector<vector<int>> Potwory::DodajDoMacierzy(std::vector<std::vector<int>> mac)
+{
+    for (auto &poz : pozycje)
+    {
+        mac[poz.x][poz.y] = poz.z;
+    }
+    return mac;
+}
