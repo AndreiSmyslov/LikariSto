@@ -41,13 +41,13 @@ int main() {
     Macierz = potwory.DodajDoMacierzy(Macierz);
 
     for (int i=0; i< COLUMNS; i++)
-  {
-      for(int j=0; j < ROWS; j++)
-      {
-        cout << Macierz[i][j] << " ";
-      }
-      cout << endl;
-  }
+    {
+        for(int j=0; j < ROWS; j++)
+        {
+            cout << Macierz[i][j] << " ";
+        }
+        cout << endl;
+    }
 
     sf::Clock clock;
 
