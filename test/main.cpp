@@ -67,10 +67,10 @@ int main() {
                 window.close();
             if (event.type == sf::Event::KeyPressed) {
                 if (event.key.code == sf::Keyboard::Left) {
-                    bloczek.przesunLewo(Macierz);
+                    bloczek.przesunLewo(Macierz, macierz);
                 }
                 if (event.key.code == sf::Keyboard::Right) {
-                    bloczek.przesunPrawo(Macierz);
+                    bloczek.przesunPrawo(Macierz, macierz);
                 }
                 if (event.key.code == sf::Keyboard::A) {
                     bloczek.obrocLewo(Macierz);
