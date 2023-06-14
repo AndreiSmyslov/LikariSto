@@ -57,7 +57,17 @@ int main() {
     // petla dziala tak dlugo jak program jest wlaczony
     while (window.isOpen()) {
 
+<<<<<<< HEAD
+
+
+        // check all the window's events that were triggered since the last iteration of the loop
+        sf::Time time1 = clock.getElapsedTime();
+        if (time1.asMilliseconds() > 16.7)
+        {
+        // Sprawdzanie czy został nacisniety ktorys z klawiszy na klawiaturze
+=======
     // wszystkie klawiaturowe eventy poruszanie sie bloczka, zatrzymywanie gry, zamykanie programu
+>>>>>>> 0a6cc6caa2f184fcd9210691d9b292ce7c8754fd
         sf::Event event;
         while (window.pollEvent(event)) {
 
@@ -86,8 +96,12 @@ int main() {
         window.clear(sf::Color::Black);
 
 
+<<<<<<< HEAD
+        // Animacja bloczka i tworzenie nowego, gdy funkcja zwroci wartosc true, co bedzie rownowazne z tym ze bloczek stanal na czyms
+=======
 
     // generowanie nowego bloczka, ruch bloczka, dodanie go do Macierzy, gdy sie zatrzyma
+>>>>>>> 0a6cc6caa2f184fcd9210691d9b292ce7c8754fd
         sf::Time czas = clock.getElapsedTime();
         if(czas.asMilliseconds()>(300))
         {
@@ -95,14 +109,20 @@ int main() {
 
             if(bloczek.wypelnijMacierz(macierz, COLUMNS, ROWS, Macierz))
             {
+                // Dodaje do zmiennej Macierz nowe dwa elementy ktore sa efektem bloczka, ktory dopiero co spaadl
                 Macierz = dodaj_macierze(Macierz, macierz);
+                // Ustawia wszystkie parametry domyslnie
                 bloczek.nowy();
             }
         }
 
+<<<<<<< HEAD
+        // Wypelnainie ekranu kwadratami o koloroch zaleznych od liczb z macierzy liczby
+=======
 
 
     // itercja kolorujaca plansze
+>>>>>>> 0a6cc6caa2f184fcd9210691d9b292ce7c8754fd
         for (int i=0; i< COLUMNS; i++)
         {
             for(int j=0; j < ROWS; j++)
@@ -136,6 +156,9 @@ int main() {
             }
         }
 
+<<<<<<< HEAD
+        // Nalozenie na ekran kwadratow kwadratow ktore juz tam byly i staly juz od wczesniejszych rund
+=======
     // usuwanie bloczkow jesli spelnione sa warunki
 //        for (int i=0; i< COLUMNS - 3; i++)
 //        {
@@ -178,6 +201,7 @@ int main() {
 
 
     //iteracja kolorujaca wszystkie pola będące w Macierzy
+>>>>>>> 0a6cc6caa2f184fcd9210691d9b292ce7c8754fd
         for (int i=0; i< COLUMNS; i++)
         {
             for(int j=0; j < ROWS; j++)
