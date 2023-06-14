@@ -46,10 +46,11 @@ Potwory::Potwory(int liczba)
     } while(zajete);
     Potwory::pozycje.emplace_back(poz);
     }
+    // losowanie koloru
     for (auto &lock : pozycje)
     {
         iz = z(rng);
-        lock.z = iz;
+        lock.z = iz+100;
     }
 
 }
