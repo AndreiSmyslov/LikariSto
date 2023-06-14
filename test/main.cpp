@@ -58,7 +58,6 @@ int main() {
     while (window.isOpen()) {
 
     // wszystkie klawiaturowe eventy poruszanie sie bloczka, zatrzymywanie gry, zamykanie programu
->>>>>>> 0a6cc6caa2f184fcd9210691d9b292ce7c8754fd
         sf::Event event;
         while (window.pollEvent(event)) {
 
