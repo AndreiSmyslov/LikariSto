@@ -1,10 +1,10 @@
+#include "potwory.h"
 #include "bloczek.h"
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <cstdlib>
 #include <vector>
-
 
 using namespace std;
 
@@ -14,68 +14,67 @@ int main() {
 
     srand(time(NULL));
 
-    // Get a random number
-
     int CELL_SIZE = 9;
     int COLUMNS = 8;
     int SCREEN_RESIZE = 4;
     int ROWS = 16;
 
+    // przesuniecie planszy
     int pozY = 240;
     int pozX = 300;
 
-//    int spadanie=0;
-//    int pozycja =3;
-
-//    bool przesuwanie =true;
-//    int numerTekstury1;
-//    int numerTekstury2;
-
     Bloczek bloczek;
 
-
+    // macierz zawiera w sobie pozycje ruchu tymczasowego bloczka
     vector<vector<int>> macierz(COLUMNS, vector<int>(ROWS));
+    // Macierz zawiera w sobie pozycje stałych obiektów
     vector<vector<int>> Macierz(COLUMNS, vector<int>(ROWS));
 
+    // tworzenie okienka
+    sf::RenderWindow window(sf::VideoMode(900, 900), "Likaristo", sf::Style::Close);
 
-    // create the window
-    sf::RenderWindow window(sf::VideoMode(900, 900), "Dr. Mario", sf::Style::Close);
-
-
+    // rectangle kwadratem będącym kratka na plaszy
     sf::RectangleShape rectangle(sf::Vector2f(CELL_SIZE*SCREEN_RESIZE-1, CELL_SIZE*SCREEN_RESIZE-1));
-    rectangle.setFillColor(sf::Color(100, 50, 250));
-    //rectangle.setPosition(300, 170);
 
+    // inicjalizacja potworow i dodanie ich do Macierzy
+    Potwory potwory(88);
+    Macierz = potwory.DodajDoMacierzy(Macierz);
+
+    for (int i=0; i< COLUMNS; i++)
+    {
+        for(int j=0; j < ROWS; j++)
+        {
+            cout << Macierz[i][j] << " ";
+        }
+        cout << endl;
+    }
 
     sf::Clock clock;
 
+    // ustawienie framerejtu
+    window.setFramerateLimit(120);
 
-    // run the program as long as the window is open
+    // petla dziala tak dlugo jak program jest wlaczony
     while (window.isOpen()) {
 
-
-
-        // check all the window's events that were triggered since the last iteration of the loop
-        sf::Time time1 = clock.getElapsedTime();
-        if (time1.asMilliseconds() > 16.7)
-        {
-        // Sprawdzanie czy został nacisniety ktorys z klawiszy na klawiaturze
+    // wszystkie klawiaturowe eventy poruszanie sie bloczka, zatrzymywanie gry, zamykanie programu
         sf::Event event;
         while (window.pollEvent(event)) {
-            // "close requested" event: we close the window
+
             if (event.type == sf::Event::Closed)
                 window.close();
+
             if (event.type == sf::Event::KeyPressed) {
                 if (event.key.code == sf::Keyboard::Left) {
                     bloczek.przesunLewo(Macierz, macierz);
                 }
-                if (event.key.code == sf::Keyboard::Right) {
+                else if (event.key.code == sf::Keyboard::Right) {
                     bloczek.przesunPrawo(Macierz, macierz);
                 }
                 if (event.key.code == sf::Keyboard::A) {
                     bloczek.obrocLewo(Macierz);
                 }
-                if (event.key.code == sf::Keyboard::D) {
+                else if (event.key.code == sf::Keyboard::D) {
                     bloczek.obrocPrawo(Macierz);
                 }
                 if (event.key.code == sf::Keyboard::Space) {
@@ -87,11 +86,13 @@ int main() {
         window.clear(sf::Color::Black);
 
 
-        // Animacja bloczka i tworzenie nowego, gdy funkcja zwroci wartosc true, co bedzie rownowazne z tym ze bloczek stanal na czyms
+
+    // generowanie nowego bloczka, ruch bloczka, dodanie go do Macierzy, gdy sie zatrzyma
         sf::Time czas = clock.getElapsedTime();
         if(czas.asMilliseconds()>(300))
         {
             clock.restart();
+
             if(bloczek.wypelnijMacierz(macierz, COLUMNS, ROWS, Macierz))
             {
                 // Dodaje do zmiennej Macierz nowe dwa elementy ktore sa efektem bloczka, ktory dopiero co spaadl
@@ -101,18 +102,19 @@ int main() {
             }
         }
 
-        // Wypelnainie ekranu kwadratami o koloroch zaleznych od liczb z macierzy liczby
+    // itercja kolorujaca plansze
         for (int i=0; i< COLUMNS; i++)
         {
             for(int j=0; j < ROWS; j++)
             {
+    // czesc iteracji kolorujaca nieaktywne szare kartki na bazie macierzy
                 if(macierz[i][j]==0)
                 {
                     rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
                     rectangle.setFillColor(sf::Color(100, 100, 100));
                     window.draw(rectangle);
                 }
-
+    // czesc iteracji kolorujaca pola ruchu bloczka na bazie macierzy
                 if(macierz[i][j]==1)
                 {
                     rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
@@ -134,45 +136,83 @@ int main() {
             }
         }
 
-        // Nalozenie na ekran kwadratow kwadratow ktore juz tam byly i staly juz od wczesniejszych rund
+
+    // usuwanie bloczkow jesli spelnione sa warunki
+//        for (int i=0; i< COLUMNS - 3; i++)
+//        {
+//            for(int j=0; j < ROWS; j++)
+//            {
+//                int suma = Macierz[i][j] + Macierz[i+1][j] + Macierz[i+2][j] + Macierz[i+3][j];
+//                while (suma>100)
+//                {
+//                    suma -= 100;
+//                }
+//                if(suma == 4 || suma == 8 || suma == 12)
+//                {
+//                    Macierz[i][j] = 0;
+//                    Macierz[i+1][j] = 0;
+//                    Macierz[i+2][j] = 0;
+//                    Macierz[i+3][j] = 0;
+//                }
+//            }
+//        }
+        for (int i=0; i< COLUMNS; i++)
+            {
+                for(int j=0; j < ROWS-3; j++)
+                {
+                    int suma = Macierz[i][j] + Macierz[i][j+1] + Macierz[i][j+2] + Macierz[i][j+3];
+                    while (suma>100)
+                    {
+                        suma -= 100;
+                    }
+                    if(suma == 4 || suma == 8 || suma == 12)
+                    {
+                        Macierz[i][j] = 0;
+                        Macierz[i][j+1] = 0;
+                        Macierz[i][j+2] = 0;
+                        Macierz[i][j+3] = 0;
+                    }
+                }
+            }
+
+
+
+
+    //iteracja kolorujaca wszystkie pola będące w Macierzy
         for (int i=0; i< COLUMNS; i++)
         {
             for(int j=0; j < ROWS; j++)
             {
-                if(Macierz[i][j]==1)
+                if(Macierz[i][j]==1 || Macierz[i][j]==101)
                 {
                     rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
                     rectangle.setFillColor(sf::Color(0, 0, 200));
                     window.draw(rectangle);
                 }
-                if(Macierz[i][j]==2)
+                if(Macierz[i][j]==2 || Macierz[i][j]==102)
                 {
                     rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
                     rectangle.setFillColor(sf::Color(0, 200, 0));
                     window.draw(rectangle);
                 }
-                if(Macierz[i][j]==3)
+                if(Macierz[i][j]==3 || Macierz[i][j]==103)
                 {
                     rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
                     rectangle.setFillColor(sf::Color(200, 0, 0));
                     window.draw(rectangle);
                 }
-//                if(Macierz[i][j]!=0)
-//                {
-//                    rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
-//                    rectangle.setFillColor(sf::Color(0, 0, 200));
-//                    window.draw(rectangle);
-//                }
             }
         }
+
         window.display();
-        }
 
 
     }
 
     return 0;
 }
+
+
 std::vector<std::vector<int>> dodaj_macierze(const std::vector<std::vector<int>>& macierz1, const std::vector<std::vector<int>>& macierz2) {
     // Sprawdzenie wymiarów macierzy
     if (macierz1.size() != macierz2.size() || macierz1[0].size() != macierz2[0].size()) {
