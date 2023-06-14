@@ -10,8 +10,8 @@ class Bloczek
 public:
     Bloczek();
     bool wypelnijMacierz(std::vector<std::vector<int>> &macierz, int COLUMNS, int ROWS, std::vector<std::vector<int>> Macierz);
-    void przesunPrawo(std::vector<std::vector<int>> Macierz);
-    void przesunLewo(std::vector<std::vector<int> > Macierz);
+    void przesunPrawo(std::vector<std::vector<int>> Macierz, std::vector<std::vector<int>> &macierz);
+    void przesunLewo(std::vector<std::vector<int> > Macierz, std::vector<std::vector<int> > &macierz);
     void nowy();
     void obrocLewo(std::vector<std::vector<int> > Macierz);
     void obrocPrawo(std::vector<std::vector<int> > Macierz);
