@@ -8,7 +8,8 @@
 
 using namespace std;
 
-std::vector<std::vector<int>> dodaj_macierze(const std::vector<std::vector<int>>& macierz1, const std::vector<std::vector<int>>& macierz2);
+vector<vector<int>> dodaj_macierze(const vector<vector<int>>& macierz1, const vector<vector<int>>& macierz2);
+vector<vector<int>> usuwanieBloczkow(vector<vector<int>>& Macierz, int rows, int cols);
 
 int main() {
 
@@ -37,17 +38,8 @@ int main() {
     sf::RectangleShape rectangle(sf::Vector2f(CELL_SIZE*SCREEN_RESIZE-1, CELL_SIZE*SCREEN_RESIZE-1));
 
     // inicjalizacja potworow i dodanie ich do Macierzy
-    Potwory potwory(88);
+    Potwory potwory(80);
     Macierz = potwory.DodajDoMacierzy(Macierz);
-
-    for (int i=0; i< COLUMNS; i++)
-    {
-        for(int j=0; j < ROWS; j++)
-        {
-            cout << Macierz[i][j] << " ";
-        }
-        cout << endl;
-    }
 
     sf::Clock clock;
 
@@ -102,6 +94,9 @@ int main() {
             }
         }
 
+    // usuwanie bloczkow jesli spelnione sa warunki
+    Macierz = usuwanieBloczkow(Macierz, COLUMNS, ROWS);
+
     // itercja kolorujaca plansze
         for (int i=0; i< COLUMNS; i++)
         {
@@ -136,47 +131,7 @@ int main() {
             }
         }
 
-
-    // usuwanie bloczkow jesli spelnione sa warunki
-//        for (int i=0; i< COLUMNS - 3; i++)
-//        {
-//            for(int j=0; j < ROWS; j++)
-//            {
-//                int suma = Macierz[i][j] + Macierz[i+1][j] + Macierz[i+2][j] + Macierz[i+3][j];
-//                while (suma>100)
-//                {
-//                    suma -= 100;
-//                }
-//                if(suma == 4 || suma == 8 || suma == 12)
-//                {
-//                    Macierz[i][j] = 0;
-//                    Macierz[i+1][j] = 0;
-//                    Macierz[i+2][j] = 0;
-//                    Macierz[i+3][j] = 0;
-//                }
-//            }
-//        }
-        for (int i=0; i< COLUMNS; i++)
-            {
-                for(int j=0; j < ROWS-3; j++)
-                {
-                    int suma = Macierz[i][j] + Macierz[i][j+1] + Macierz[i][j+2] + Macierz[i][j+3];
-                    while (suma>100)
-                    {
-                        suma -= 100;
-                    }
-                    if(suma == 4 || suma == 8 || suma == 12)
-                    {
-                        Macierz[i][j] = 0;
-                        Macierz[i][j+1] = 0;
-                        Macierz[i][j+2] = 0;
-                        Macierz[i][j+3] = 0;
-                    }
-                }
-            }
-
-
-
+        ///
 
     //iteracja kolorujaca wszystkie pola będące w Macierzy
         for (int i=0; i< COLUMNS; i++)
@@ -213,17 +168,17 @@ int main() {
 }
 
 
-std::vector<std::vector<int>> dodaj_macierze(const std::vector<std::vector<int>>& macierz1, const std::vector<std::vector<int>>& macierz2) {
+vector<vector<int>> dodaj_macierze(const vector<vector<int>>& macierz1, const vector<vector<int>>& macierz2) {
     // Sprawdzenie wymiarów macierzy
     if (macierz1.size() != macierz2.size() || macierz1[0].size() != macierz2[0].size()) {
-        throw std::invalid_argument("Macierze musza miec takie same wymiary.");
+        throw invalid_argument("Macierze musza miec takie same wymiary.");
     }
 
-    std::vector<std::vector<int>> suma_macierzy;
+    vector<vector<int>> suma_macierzy;
     suma_macierzy.reserve(macierz1.size());
 
     for (size_t i = 0; i < macierz1.size(); ++i) {
-        std::vector<int> wiersz;
+        vector<int> wiersz;
         wiersz.reserve(macierz1[i].size());
 
         for (size_t j = 0; j < macierz1[i].size(); ++j) {
@@ -235,4 +190,59 @@ std::vector<std::vector<int>> dodaj_macierze(const std::vector<std::vector<int>>
     }
 
     return suma_macierzy;
+}
+
+vector<vector<int>> usuwanieBloczkow(vector<vector<int>>& Macierz, int rows, int cols)
+{
+  vector<vector<int>> tempMacierz = Macierz;
+
+  for (int i=0; i< rows; i++)
+  {
+      for(int j=0; j < cols; j++)
+      {
+          while(tempMacierz[i][j]>100)
+          {
+            tempMacierz[i][j] -= 100;
+          }
+
+      }
+  }
+  // Sprawdź wiersze
+  for (auto& row : tempMacierz) {
+    int licznik = 1;
+    int poprzedniNumer = row[0];
+    for (size_t i = 1; i < row.size(); i++) {
+      if (row[i] == poprzedniNumer) {
+        licznik++;
+        if (licznik >= 4) {
+          for (size_t j = i - licznik + 1; j <= i; j++) {
+            Macierz[&row - &tempMacierz[0]][j] = 0;
+          }
+        }
+      } else {
+        licznik = 1;
+        poprzedniNumer = row[i];
+      }
+    }
+  }
+
+  // Sprawdź kolumny
+  for (int j = 0; j < cols; j++) {
+    int licznik = 1;
+    int poprzedniNumer = tempMacierz[0][j];
+    for (int i = 1; i < rows; i++) {
+      if (tempMacierz[i][j] == poprzedniNumer) {
+        licznik++;
+        if (licznik >= 4) {
+          for (int k = i - licznik + 1; k <= i; k++) {
+            Macierz[k][j] = 0;
+          }
+        }
+      } else {
+        licznik = 1;
+        poprzedniNumer = tempMacierz[i][j];
+      }
+    }
+  }
+  return Macierz;
 }
