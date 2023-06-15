@@ -31,7 +31,7 @@ int main() {
 
     // przesuniecie planszy
     int pozY = 240;
-    int pozX = 300;
+    int pozX = 200;
 
     // set uzyty przy okreslaniu ktore bloczki maja nie spadac w glownej petli
     set<int> spadanieStop = {101,102,103};
@@ -39,7 +39,7 @@ int main() {
     // W zmiennej czcionka mamy czcionke, jezeli chcesz polskie znaki to przed tekstem daj 'L'
     // np. sf::Text text(L"śćżźą", font, 24);
     sf::Font czcionka;
-    if (!czcionka.loadFromFile("arial.ttf"))
+    if (!czcionka.loadFromFile("ARCADECLASSIC.ttf"))
     {
         return EXIT_FAILURE;
     }
@@ -72,15 +72,48 @@ int main() {
     // rectangle kwadratem będącym kratka na plaszy
     sf::RectangleShape rectangle(sf::Vector2f(CELL_SIZE*SCREEN_RESIZE-1, CELL_SIZE*SCREEN_RESIZE-1));
 
+    // wektor spritów i inicjalizacja tekstów
+    std::vector<std::unique_ptr<sf::Sprite>> sprajtyMain;
+    std::vector<std::unique_ptr<sf::Sprite>> sprajtyKon;
+
     sf::Texture tloTexture;
     if (!tloTexture.loadFromFile("tlo_main_gra_texture.png")) {
         std::cerr << "Could not load texture" << std::endl;
-        return 1;
-    }
+        return 1; }
     tloTexture.setRepeated(true);
     sf::Sprite tloSprite;
     tloSprite.setTexture(tloTexture);
     tloSprite.setTextureRect(sf::IntRect(0, 0, 900, 900));
+    sprajtyMain.emplace_back(make_unique<sf::Sprite>(tloSprite));
+    sf::Texture butelkaTexture;
+    if (!butelkaTexture.loadFromFile("butelka_main_gra_texture.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+        return 1;}
+    sf::Sprite butelkaSprite;
+    butelkaSprite.setTexture(butelkaTexture);
+    butelkaSprite.setTextureRect(sf::IntRect(0, 0, 80, 176));
+    butelkaSprite.setPosition(pozX-36, pozY-180);
+    butelkaSprite.setScale(4.5, 4.5);
+    sprajtyMain.emplace_back(make_unique<sf::Sprite>(butelkaSprite));
+
+    sf::Texture tloKonTexture1;
+    if (!tloKonTexture1.loadFromFile("tlo_win_kon_texture.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+        return 1; }
+    tloKonTexture1.setRepeated(true);
+    sf::Sprite tloKonSpriteW;
+    tloKonSpriteW.setTexture(tloKonTexture1);
+    tloKonSpriteW.setTextureRect(sf::IntRect(0, 0, 900, 900));
+    sf::Texture tloKonTexture2;
+    if (!tloKonTexture2.loadFromFile("tlo_lose_kon_texture.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+        return 1; }
+    tloKonTexture2.setRepeated(true);
+    sf::Sprite tloKonSpriteL;
+    tloKonSpriteL.setTexture(tloKonTexture2);
+    tloKonSpriteL.setTextureRect(sf::IntRect(0, 0, 900, 900));
+
+
 
 
 
@@ -216,11 +249,11 @@ int main() {
 
             wczytajProstokaty(wszystkieKsztalty);
 
-            sf::Text tryb(L"Ilość Wirusów:", czcionka, 30);
+            sf::Text tryb(L"Ilosc Wirusow", czcionka, 30);
             tryb.setPosition(210.f, 230.f);
             wszystkieKsztalty.emplace_back(make_unique<sf::Text>(tryb));
 
-            sf::Text szybkosc(L"Tryb gry:", czcionka, 30);
+            sf::Text szybkosc(L"Tryb gry", czcionka, 30);
             szybkosc.setPosition(210.f, 390.f);
             wszystkieKsztalty.emplace_back(make_unique<sf::Text>(szybkosc));
 
@@ -236,21 +269,21 @@ int main() {
             slider.setFillColor(sf::Color::Red);
             slider.setPosition(pozycjaSuwakX, pozycjaSuwakY);
 
-            sf::Text tryby(L"1. Tryb łatwy  2. Tryb średni  3. Tryb trudny", czcionka, 24);
+            sf::Text tryby(L"             Latwy                           Sredni                              Trudny", czcionka, 24);
             tryby.setPosition(200.f, 465.f);
             wszystkieKsztalty.emplace_back(make_unique<sf::Text>(tryby));
 
             // Wyświetlanie opcji która została wybrana klikając przycisk:
             if(poziomTrudnosci==1)
             {
-                sf::Text poziom(L"Łatwy", czcionka, 25);
+                sf::Text poziom(L"Latwy", czcionka, 25);
                 poziom.setPosition(440.f, 390.f);
                 wszystkieKsztalty.emplace_back(make_unique<sf::Text>(poziom));
             }
 
             if(poziomTrudnosci==2)
             {
-                sf::Text poziom(L"Średni", czcionka, 25);
+                sf::Text poziom(L"Sredni", czcionka, 25);
                 poziom.setPosition(440.f, 390.f);
                 wszystkieKsztalty.emplace_back(make_unique<sf::Text>(poziom));
             }
@@ -284,7 +317,7 @@ int main() {
             ilosc.setPosition(460.f, 230.f);
             wszystkieKsztalty.emplace_back(make_unique<sf::Text>(ilosc));
 
-            sf::Text graj(L"GRAJ", czcionka, 45);
+            sf::Text graj(L"  GRAJ", czcionka, 45);
             graj.setPosition(570.f, 600.f);
             graj.setFillColor(sf::Color::Yellow);
             wszystkieKsztalty.emplace_back(make_unique<sf::Text>(graj));
@@ -302,7 +335,9 @@ int main() {
 
         if(etapGry==2)
         {
-            window.draw(tloSprite);
+            for(const auto &s : sprajtyMain) {
+                window.draw(*s);
+            }
 
             // generowanie nowego bloczka, ruch bloczka, dodanie go do Macierzy, gdy sie zatrzyma
             sf::Time czas = clock.getElapsedTime();
@@ -385,11 +420,11 @@ int main() {
                 }
             }
             liczbaPotworkow=licznik(Macierz, COLUMNS, ROWS);
-            sf::Text potw(L"Zostało ci jeszcze:", czcionka, 30);
-            potw.setPosition(620.f, 230.f);
+            sf::Text potw(L"Zostalo ci jeszcze", czcionka, 30);
+            potw.setPosition(580.f, 230.f);
             window.draw(potw);
             sf::Text licz(to_string(liczbaPotworkow), czcionka, 35);
-            licz.setPosition(660.f, 280.f);
+            licz.setPosition(700.f, 280.f);
             window.draw(licz);
             wygrany=czyWygrany(COLUMNS, ROWS, Macierz);
             przegrany=czyPrzegrany(Macierz);
@@ -399,14 +434,22 @@ int main() {
 
             if(wygrany)
             {
+
                 sf::Time czas1 = clock1.getElapsedTime();
                 if(czas1.asMilliseconds()>(1000))
                 {
+
                     window.clear(sf::Color::Black);
-                    sf::Text wygr(L"WYGRAŁEŚ:", czcionka, 30);
+
+                    window.draw(tloKonSpriteW);
+
+                    sf::Text wygr(L"WYGRALES", czcionka, 30);
                     wygr.setPosition(210.f, 230.f);
                     window.draw(wygr);
 
+                    for(const auto &s : sprajtyKon) {
+                        window.draw(*s);
+                    }
                     sf::RectangleShape prostokat1(sf::Vector2f(220.0, 60.0));
                     prostokat1.setPosition(200.0, 460.0);
                     prostokat1.setFillColor(sf::Color::Green);
@@ -417,11 +460,11 @@ int main() {
                     prostokat2.setFillColor(sf::Color::Blue);
                     window.draw(prostokat2);
 
-                    sf::Text re(L"Spróbuj ponownie:", czcionka, 20);
+                    sf::Text re(L"Sprobuj ponownie", czcionka, 20);
                     re.setPosition(210.f, 465.f);
                     window.draw(re);
 
-                    sf::Text wy(L"Wyjdź:", czcionka, 20);
+                    sf::Text wy(L"Wyjdz", czcionka, 20);
                     wy.setPosition(430.f, 465.f);
                     window.draw(wy);
                 }
@@ -432,7 +475,8 @@ int main() {
                 if(czas1.asMilliseconds()>(1000))
                 {
                     window.clear(sf::Color::Black);
-                    sf::Text prz(L"PRZEGRAŁEŚ:", czcionka, 30);
+                    window.draw(tloKonSpriteL);
+                    sf::Text prz(L"PRZEGRALES", czcionka, 30);
                     prz.setPosition(210.f, 230.f);
                     window.draw(prz);
 
@@ -446,15 +490,15 @@ int main() {
                     prostokat2.setFillColor(sf::Color::Blue);
                     window.draw(prostokat2);
 
-                    sf::Text re(L"Spróbuj ponownie:", czcionka, 20);
+                    sf::Text re(L"Sprobuj ponownie", czcionka, 20);
                     re.setPosition(210.f, 465.f);
                     window.draw(re);
 
-                    sf::Text wy(L"Wyjdź:", czcionka, 20);
+                    sf::Text wy(L"Wyjdz", czcionka, 20);
                     wy.setPosition(430.f, 465.f);
                     window.draw(wy);
 
-                    sf::Text zb(L"Zostało ci do zbicia jeszcze: ", czcionka, 30);
+                    sf::Text zb(L"Zostalo ci do zbicia jeszcze ", czcionka, 30);
                     zb.setPosition(220.f, 310.f);
                     window.draw(zb);
 
@@ -622,9 +666,9 @@ void wczytajProstokaty(vector<unique_ptr<sf::Drawable> > &ksztalty)
 Matrix opadanieBloczkow(Matrix& macierz, set<int> stop, int rows, int cols) {
     for (int i = rows - 1; i > 0; i--) {
         for (int j = 0; j < cols; j++) {
-            if (macierz[i][j] == 0 && stop.find(macierz[i - 1][j]) != stop.end()) {
-                macierz[i][j] = macierz[i - 1][j];
-                macierz[i - 1][j] = 0;
+            if (macierz[i][j] == 0 && stop.find(macierz[i][j-1]) != stop.end()) {
+                macierz[i][j] = macierz[i ][j-1];
+                macierz[i][j-1] = 0;
             }
         }
     }
