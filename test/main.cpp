@@ -1082,46 +1082,50 @@ int main() {
 
 
                     sf::Time czas1 = clock1.getElapsedTime();
+
+
                     if(czas1.asMilliseconds()>(1000))
-                    {
+                                        {
 
-                        window.clear(sf::Color::Black);
+                                            window.clear(sf::Color::Black);
 
-                        window.draw(tloKonSpriteW);
+                                            window.draw(tloKonSpriteW);
 
-                        sf::Text wygr("WYGRAL"+ wygranyGracz, czcionka, 30);
-                        wygr.setPosition(210.f, 230.f);
-                        window.draw(wygr);
+                                            sf::Text wygr("WYGRAL"+ wygranyGracz, czcionka, 30);
+                                            wygr.setPosition(210.f, 230.f);
+                                            window.draw(wygr);
 
-                        sf::Text wyn(L"Wynik", czcionka, 30);
-                        wyn.setPosition(220.f, 290.f);
-                        window.draw(wyn);
-                        sf::Text pr(to_string(liczbaProb) + "                        " +to_string(liczbaProb2), czcionka, 35);
-                        pr.setPosition(240.f, 315.f);
-                        window.draw(pr);
+                                            sf::Text wyn(L"Wynik", czcionka, 30);
+                                            wyn.setPosition(220.f, 290.f);
+                                            window.draw(wyn);
+                                            sf::Text pr(to_string(liczbaProb) + "                        " +to_string(liczbaProb2), czcionka, 35);
+                                            pr.setPosition(240.f, 315.f);
+                                            window.draw(pr);
 
-                        for(const auto &s : sprajtyKon) {
-                            window.draw(*s);
-                        }
-                        sf::RectangleShape prostokat1(sf::Vector2f(220.0, 60.0));
-                        prostokat1.setPosition(200.0, 460.0);
-                        prostokat1.setFillColor(sf::Color::Green);
-                        window.draw(prostokat1);
+                                            for(const auto &s : sprajtyKon) {
+                                                window.draw(*s);
+                                            }
+                                            sf::RectangleShape prostokat1(sf::Vector2f(220.0, 60.0));
+                                            prostokat1.setPosition(200.0, 550.0);
+                                            prostokat1.setFillColor(sf::Color::Green);
+                                            window.draw(prostokat1);
 
-                        sf::RectangleShape prostokat2(sf::Vector2f(220.0, 60.0));
-                        prostokat2.setPosition(420.0, 460.0);
-                        prostokat2.setFillColor(sf::Color::Blue);
-                        window.draw(prostokat2);
+                                            sf::RectangleShape prostokat2(sf::Vector2f(220.0, 60.0));
+                                            prostokat2.setPosition(420.0, 550.0);
+                                            prostokat2.setFillColor(sf::Color::Blue);
+                                            window.draw(prostokat2);
 
-                        sf::Text re(L"Sprobuj ponownie", czcionka, 20);
-                        re.setPosition(210.f, 465.f);
-                        window.draw(re);
+                                            sf::Text re(L"Sprobuj ponownie", czcionka, 20);
+                                            re.setPosition(210.f, 555.f);
+                                            window.draw(re);
 
-                        sf::Text wy(L"Wyjdz", czcionka, 20);
-                        wy.setPosition(430.f, 465.f);
-                        window.draw(wy);
-                    }
+                                            sf::Text wy(L"Wyjdz", czcionka, 20);
+                                            wy.setPosition(430.f, 555.f);
+                                            window.draw(wy);
+                                        }
                 }
+
+
                 if(przegrany)
                 {
                     if(czyPrzegrany(Macierz))
@@ -1132,39 +1136,39 @@ int main() {
 
                     sf::Time czas1 = clock1.getElapsedTime();
                     if(czas1.asMilliseconds()>(1000))
-                    {
-                        window.clear(sf::Color::Black);
-                        window.draw(tloKonSpriteL);
-                        sf::Text prz("PRZEGRAL" + przegranyGracz, czcionka, 30);
-                        prz.setPosition(210.f, 230.f);
-                        window.draw(prz);
+                                        {
+                                            window.clear(sf::Color::Black);
+                                            window.draw(tloKonSpriteL);
+                                            sf::Text prz("PRZEGRAL" + przegranyGracz, czcionka, 30);
+                                            prz.setPosition(210.f, 230.f);
+                                            window.draw(prz);
 
-                        sf::RectangleShape prostokat1(sf::Vector2f(220.0, 60.0));
-                        prostokat1.setPosition(200.0, 460.0);
-                        prostokat1.setFillColor(sf::Color::Green);
-                        window.draw(prostokat1);
+                                            sf::RectangleShape prostokat1(sf::Vector2f(220.0, 60.0));
+                                            prostokat1.setPosition(200.0, 550.0);
+                                            prostokat1.setFillColor(sf::Color::Green);
+                                            window.draw(prostokat1);
 
-                        sf::RectangleShape prostokat2(sf::Vector2f(220.0, 60.0));
-                        prostokat2.setPosition(420.0, 460.0);
-                        prostokat2.setFillColor(sf::Color::Blue);
-                        window.draw(prostokat2);
+                                            sf::RectangleShape prostokat2(sf::Vector2f(220.0, 60.0));
+                                            prostokat2.setPosition(420.0, 550.0);
+                                            prostokat2.setFillColor(sf::Color::Blue);
+                                            window.draw(prostokat2);
 
-                        sf::Text re(L"Sprobuj ponownie", czcionka, 20);
-                        re.setPosition(210.f, 465.f);
-                        window.draw(re);
+                                            sf::Text re(L"Sprobuj ponownie", czcionka, 20);
+                                            re.setPosition(210.f, 555.f);
+                                            window.draw(re);
 
-                        sf::Text wy(L"Wyjdz", czcionka, 20);
-                        wy.setPosition(430.f, 465.f);
-                        window.draw(wy);
+                                            sf::Text wy(L"Wyjdz", czcionka, 20);
+                                            wy.setPosition(430.f, 555.f);
+                                            window.draw(wy);
 
-                        sf::Text zb(L"Zostalo ci do zbicia jeszcze ", czcionka, 30);
-                        zb.setPosition(220.f, 310.f);
-                        window.draw(zb);
+                                            sf::Text zb(L"Zostalo ci do zbicia jeszcze ", czcionka, 30);
+                                            zb.setPosition(220.f, 310.f);
+                                            window.draw(zb);
 
-                        sf::Text licz(to_string(liczbaPotworkow) + "                        " +to_string(liczbaPotworkow2), czcionka, 35);
-                        licz.setPosition(380.f, 350.f);
-                        window.draw(licz);
-                    }
+                                            sf::Text licz(to_string(liczbaPotworkow) + "                        " +to_string(liczbaPotworkow2), czcionka, 35);
+                                            licz.setPosition(380.f, 350.f);
+                                            window.draw(licz);
+                                        }
                 }
             }
 
