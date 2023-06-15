@@ -17,33 +17,10 @@ bool czyPrzegrany(Matrix Macierz);
 void wczytajProstokaty(vector<unique_ptr<sf::Drawable>> &ksztalty);
 int licznik(Matrix Macierz, int, int);
 Matrix opadanieBloczkow(Matrix& macierz, set<int> stop, int rows, int cols);
+vector<vector<sf::Sprite>> stworzSprajty(int cols, int rows);
 
 
 int main() {
-
-
-    sf::Texture pigula_zolta;
-    if (!pigula_zolta.loadFromFile("textury/pigula_zolta_texture.png")) {
-        std::cerr << "Błąd podczas wczytywania tekstury 1." << std::endl;
-        return -1;
-    }
-
-    sf::Texture pigula_fioletowa;
-    if (!pigula_zolta.loadFromFile("textury/pigula_fioletowa_texture.png")) {
-        std::cerr << "Błąd podczas wczytywania tekstury 2." << std::endl;
-        return -1;
-    }
-
-    sf::Texture pigula_morska;
-    if (!pigula_zolta.loadFromFile("textury/pigula_morski_texture.png")) {
-        std::cerr << "Błąd podczas wczytywania tekstury 3." << std::endl;
-        return -1;
-    }
-
-    sf::Sprite sprite;
-    sprite.setScale(5.4,5.4);
-
-
 
     srand(time(NULL));
 
@@ -63,7 +40,7 @@ int main() {
     // W zmiennej czcionka mamy czcionke, jezeli chcesz polskie znaki to przed tekstem daj 'L'
     // np. sf::Text text(L"śćżźą", font, 24);
     sf::Font czcionka;
-    if (!czcionka.loadFromFile("ARCADECLASSIC.ttf"))
+    if (!czcionka.loadFromFile("textury/ARCADECLASSIC.ttf"))
     {
         return EXIT_FAILURE;
     }
@@ -83,12 +60,23 @@ int main() {
     bool wygrany=false;
     bool przegrany=false;
 
+    //zmienne do animowania potworow
+    sf::Clock clock2;
+    float animationTime = 0.6f;
+    sf::Texture potworFioletowyTextures[2];
+    sf::Texture potworMorskiTextures[2];
+    sf::Texture potworZoltyTextures[2];
+
     Bloczek bloczek;
 
     // macierz zawiera w sobie pozycje ruchu tymczasowego bloczka
     Matrix macierz(COLUMNS, vector<int>(ROWS));
-    // Macierz zawiera w sobie pozycje stałych obiektów
+    // Macierz zawiera w sobie pozycje obiektów ktorymi gracz nie porusza
     Matrix Macierz(COLUMNS, vector<int>(ROWS));
+    // Sprajty zawierają w sobie pozycje kolcków planszy
+    vector<vector<sf::Sprite>> Sprajty = stworzSprajty(COLUMNS, ROWS);
+    // Tekstury zawierają w sobie tekstury ktore sa cyklicznie zamienianie w podczas ich rysowania
+    vector<sf::Texture> Tekstury;
 
     // tworzenie okienka
     sf::RenderWindow window(sf::VideoMode(900, 900), "Likaristo", sf::Style::Close);
@@ -97,12 +85,12 @@ int main() {
     sf::RectangleShape rectangle(sf::Vector2f(CELL_SIZE*SCREEN_RESIZE-1, CELL_SIZE*SCREEN_RESIZE-1));
 
 
-    // wektor spritów i inicjalizacja tekstów
+    // wektor spritów i inicjalizacja tekstów wraz z niektrórymi sprite'ami
     std::vector<std::unique_ptr<sf::Sprite>> sprajtyMain;
     std::vector<std::unique_ptr<sf::Sprite>> sprajtyKon;
 
     sf::Texture tloTexture;
-    if (!tloTexture.loadFromFile("tlo_main_gra_texture.png")) {
+    if (!tloTexture.loadFromFile("textury/tlo_main_gra_texture.png")) {
         std::cerr << "Could not load texture" << std::endl;
         return 1; }
     tloTexture.setRepeated(true);
@@ -111,7 +99,7 @@ int main() {
     tloSprite.setTextureRect(sf::IntRect(0, 0, 900, 900));
     sprajtyMain.emplace_back(make_unique<sf::Sprite>(tloSprite));
     sf::Texture butelkaTexture;
-    if (!butelkaTexture.loadFromFile("butelka_main_gra_texture.png")) {
+    if (!butelkaTexture.loadFromFile("textury/butelka_main_gra_texture.png")) {
         std::cerr << "Could not load texture" << std::endl;
         return 1;}
     sf::Sprite butelkaSprite;
@@ -122,7 +110,7 @@ int main() {
     sprajtyMain.emplace_back(make_unique<sf::Sprite>(butelkaSprite));
 
     sf::Texture tloKonTexture1;
-    if (!tloKonTexture1.loadFromFile("tlo_win_kon_texture.png")) {
+    if (!tloKonTexture1.loadFromFile("textury/tlo_win_kon_texture.png")) {
         std::cerr << "Could not load texture" << std::endl;
         return 1; }
     tloKonTexture1.setRepeated(true);
@@ -130,13 +118,51 @@ int main() {
     tloKonSpriteW.setTexture(tloKonTexture1);
     tloKonSpriteW.setTextureRect(sf::IntRect(0, 0, 900, 900));
     sf::Texture tloKonTexture2;
-    if (!tloKonTexture2.loadFromFile("tlo_lose_kon_texture.png")) {
+    if (!tloKonTexture2.loadFromFile("textury/tlo_lose_kon_texture.png")) {
         std::cerr << "Could not load texture" << std::endl;
         return 1; }
     tloKonTexture2.setRepeated(true);
     sf::Sprite tloKonSpriteL;
     tloKonSpriteL.setTexture(tloKonTexture2);
     tloKonSpriteL.setTextureRect(sf::IntRect(0, 0, 900, 900));
+
+    sf::Texture pigula_zolta;
+    if (!pigula_zolta.loadFromFile("textury/pigula_zolta_texture.png")) {
+        std::cerr << "Błąd podczas wczytywania tekstury 1." << std::endl;
+        return -1;}
+    sf::Texture pigula_fioletowa;
+    if (!pigula_fioletowa.loadFromFile("textury/pigula_fioletowa_texture.png")) {
+        std::cerr << "Błąd podczas wczytywania tekstury 2." << std::endl;
+        return -1;}
+    sf::Texture pigula_morska;
+    if (!pigula_morska.loadFromFile("textury/pigula_morski_texture.png")) {
+        std::cerr << "Błąd podczas wczytywania tekstury 3." << std::endl;
+        return -1;}
+    sf::Texture bloczekTexture;
+    if (!bloczekTexture.loadFromFile("textury/bloczek_texture.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+        return 1; }
+
+    if (!potworZoltyTextures[0].loadFromFile("textury/potwor_zolty_1_texture.png")) {
+        std::cerr << "Błąd podczas wczytywania tekstury 1." << std::endl;
+        return -1;}
+    if (!potworZoltyTextures[1].loadFromFile("textury/potwor_zolty_2_texture.png")) {
+        std::cerr << "Błąd podczas wczytywania tekstury 1." << std::endl;
+        return -1;}
+    if (!potworFioletowyTextures[0].loadFromFile("textury/potwor_fioletowy_1_texture.png")) {
+        std::cerr << "Błąd podczas wczytywania tekstury 1." << std::endl;
+        return -1;}
+    if (!potworFioletowyTextures[1].loadFromFile("textury/potwor_fioletowy_2_texture.png")) {
+        std::cerr << "Błąd podczas wczytywania tekstury 1." << std::endl;
+        return -1;}
+    if (!potworMorskiTextures[0].loadFromFile("textury/potwor_morski_1_texture.png")) {
+        std::cerr << "Błąd podczas wczytywania tekstury 1." << std::endl;
+        return -1;}
+    if (!potworMorskiTextures[1].loadFromFile("textury/potwor_morski_2_texture.png")) {
+        std::cerr << "Błąd podczas wczytywania tekstury 1." << std::endl;
+        return -1;}
+
+
 
 
 
@@ -379,65 +405,189 @@ int main() {
 
             Macierz = opadanieBloczkow(Macierz, spadanieStop, ROWS, COLUMNS);
 
-            // itercja kolorujaca plansze
             for (int i=0; i< COLUMNS; i++)
             {
                 for(int j=0; j < ROWS; j++)
                 {
-                    // czesc iteracji kolorujaca nieaktywne szare kartki na bazie macierzy
                     if(macierz[i][j]==0)
                     {
-                        rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
-                        rectangle.setFillColor(sf::Color(100, 100, 100));
-                        window.draw(rectangle);
+                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                        Sprajty[i][j].setTexture(bloczekTexture);
+                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                        window.draw(Sprajty[i][j]);
                     }
                     // czesc iteracji kolorujaca pola ruchu bloczka na bazie macierzy
                     if(macierz[i][j]==1)
                     {
-                        rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
-                        rectangle.setFillColor(sf::Color(0, 0, 200));
-                        window.draw(rectangle);
+                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                        Sprajty[i][j].setTexture(pigula_fioletowa);
+                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                        window.draw(Sprajty[i][j]);
                     }
                     if(macierz[i][j]==2)
                     {
-                        rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
-                        rectangle.setFillColor(sf::Color(0, 200, 0));
-                        window.draw(rectangle);
+                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                        Sprajty[i][j].setTexture(pigula_morska);
+                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                        window.draw(Sprajty[i][j]);
                     }
                     if(macierz[i][j]==3)
                     {
-                        rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
-                        rectangle.setFillColor(sf::Color(200, 0, 0));
-                        window.draw(rectangle);
+                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                        Sprajty[i][j].setTexture(pigula_zolta);
+                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                        window.draw(Sprajty[i][j]);
                     }
                 }
             }
 
+            sf::Time elapsed = clock2.getElapsedTime();
             //iteracja kolorujaca wszystkie pola będące w Macierzy
             for (int i=0; i< COLUMNS; i++)
             {
                 for(int j=0; j < ROWS; j++)
                 {
-                    if(Macierz[i][j]==1 || Macierz[i][j]==101)
+                    if(Macierz[i][j]==1)
                     {
-                        rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
-                        rectangle.setFillColor(sf::Color(0, 0, 200));
-                        window.draw(rectangle);
+                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                        Sprajty[i][j].setTexture(pigula_fioletowa);
+                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                        window.draw(Sprajty[i][j]);
                     }
-                    if(Macierz[i][j]==2 || Macierz[i][j]==102)
+                    if(Macierz[i][j]==2)
                     {
-                        rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
-                        rectangle.setFillColor(sf::Color(0, 200, 0));
-                        window.draw(rectangle);
+                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                        Sprajty[i][j].setTexture(pigula_morska);
+                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                        window.draw(Sprajty[i][j]);
                     }
-                    if(Macierz[i][j]==3 || Macierz[i][j]==103)
+                    if(Macierz[i][j]==3)
                     {
-                        rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
-                        rectangle.setFillColor(sf::Color(200, 0, 0));
-                        window.draw(rectangle);
+                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                        Sprajty[i][j].setTexture(pigula_zolta);
+                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                        window.draw(Sprajty[i][j]);
+                    }
+                    else if (Macierz[i][j] == 101)
+                    {
+                        // Przełączanie między teksturami co określony czas
+                        if (elapsed.asSeconds() >= animationTime)
+                        {
+                            Sprajty[i][j].setTexture(potworFioletowyTextures[1]);
+                            if (elapsed.asSeconds() >= 2*animationTime)
+                            clock2.restart();
+                        }
+                        else
+                        {
+                            Sprajty[i][j].setTexture(potworFioletowyTextures[0]);
+                        }
+                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                        window.draw(Sprajty[i][j]);
+                    }
+                    else if (Macierz[i][j] == 102)
+                    {
+                        // Przełączanie między teksturami co określony czas
+                        if (elapsed.asSeconds() >= animationTime)
+                        {
+                            Sprajty[i][j].setTexture(potworMorskiTextures[1]);
+                            if (elapsed.asSeconds() >= 2*animationTime)
+                            clock2.restart();
+                        }
+                        else
+                        {
+                            Sprajty[i][j].setTexture(potworMorskiTextures[0]);
+                        }
+                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                        window.draw(Sprajty[i][j]);
+                    }
+                    else if (Macierz[i][j] == 103)
+                    {
+                        // Przełączanie między teksturami co określony czas
+                        if (elapsed.asSeconds() >= animationTime)
+                        {
+                            Sprajty[i][j].setTexture(potworZoltyTextures[1]);
+                            if (elapsed.asSeconds() >= 2*animationTime)
+                            clock2.restart();
+                        }
+                        else
+                        {
+                            Sprajty[i][j].setTexture(potworZoltyTextures[0]);
+                        }
+                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                        window.draw(Sprajty[i][j]);
                     }
                 }
             }
+
+
+//            // itercja kolorujaca plansze
+//            for (int i=0; i< COLUMNS; i++)
+//            {
+//                for(int j=0; j < ROWS; j++)
+//                {
+//                    // czesc iteracji kolorujaca nieaktywne szare kartki na bazie macierzy
+//                    if(macierz[i][j]==0)
+//                    {
+//                        rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
+//                        rectangle.setFillColor(sf::Color(100, 100, 100));
+//                        window.draw(rectangle);
+//                    }
+//                    // czesc iteracji kolorujaca pola ruchu bloczka na bazie macierzy
+//                    if(macierz[i][j]==1)
+//                    {
+//                        rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
+//                        rectangle.setFillColor(sf::Color(0, 0, 200));
+//                        window.draw(rectangle);
+//                    }
+//                    if(macierz[i][j]==2)
+//                    {
+//                        rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
+//                        rectangle.setFillColor(sf::Color(0, 200, 0));
+//                        window.draw(rectangle);
+//                    }
+//                    if(macierz[i][j]==3)
+//                    {
+//                        rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
+//                        rectangle.setFillColor(sf::Color(200, 0, 0));
+//                        window.draw(rectangle);
+//                    }
+//                }
+//            }
+
+//            //iteracja kolorujaca wszystkie pola będące w Macierzy
+//            for (int i=0; i< COLUMNS; i++)
+//            {
+//                for(int j=0; j < ROWS; j++)
+//                {
+//                    if(Macierz[i][j]==1 || Macierz[i][j]==101)
+//                    {
+//                        rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
+//                        rectangle.setFillColor(sf::Color(0, 0, 200));
+//                        window.draw(rectangle);
+//                    }
+//                    if(Macierz[i][j]==2 || Macierz[i][j]==102)
+//                    {
+//                        rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
+//                        rectangle.setFillColor(sf::Color(0, 200, 0));
+//                        window.draw(rectangle);
+//                    }
+//                    if(Macierz[i][j]==3 || Macierz[i][j]==103)
+//                    {
+//                        rectangle.setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j *4+pozY);
+//                        rectangle.setFillColor(sf::Color(200, 0, 0));
+//                        window.draw(rectangle);
+//                    }
+//                }
+//            }
+
+
+
+
+
+
 
             liczbaPotworkow=licznik(Macierz, COLUMNS, ROWS);
             sf::Text potw(L"Zostalo ci jeszcze", czcionka, 30);
@@ -655,7 +805,7 @@ int licznik(Matrix Macierz, int COLUMNS, int ROWS)
 }
 
 
-void wczytajProstokaty(vector<unique_ptr<sf::Drawable> > &ksztalty)
+void wczytajProstokaty(vector<unique_ptr<sf::Drawable>> &ksztalty)
 {
     sf::RectangleShape prostokat1(sf::Vector2f(145.0, 45.0));
     prostokat1.setPosition(200.0, 460.0);
@@ -694,4 +844,27 @@ Matrix opadanieBloczkow(Matrix& macierz, set<int> stop, int rows, int cols) {
         }
     }
     return macierz;
+}
+
+std::vector<std::vector<sf::Sprite>> stworzSprajty(int cols, int rows)
+{
+    std::vector<std::vector<sf::Sprite>> sprajty;
+
+    for (int i = 0; i < cols; ++i)
+    {
+        std::vector<sf::Sprite> sprajtyVector;
+
+        for (int j = 0; j < rows; ++j)
+        {
+            sf::Sprite sprite;
+
+            sprite.setScale(sf::Vector2f(6,6));
+
+            sprajtyVector.push_back(sprite);
+        }
+
+        sprajty.push_back(sprajtyVector);
+    }
+
+    return sprajty;
 }
