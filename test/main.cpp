@@ -5,22 +5,25 @@
 #include <iostream>
 #include <cstdlib>
 #include <vector>
+#include <set>
 
 using namespace std;
+using Matrix = vector<vector<int>>;
 
-vector<vector<int>> dodaj_macierze(const vector<vector<int>>& macierz1, const vector<vector<int>>& macierz2);
-vector<vector<int>> usuwanieBloczkow(vector<vector<int>>& Macierz, int rows, int cols);
-bool czyWygrany(int COLUMNS, int ROWS, vector<vector<int>> Macierz);
-bool czyPrzegrany(vector<vector<int>> Macierz);
-void wczytajProstokaty(std::vector<std::unique_ptr<sf::Drawable>> &ksztalty);
-int licznik(vector<vector<int>> Macierz, int, int);
-
+Matrix dodaj_macierze(const Matrix& macierz1, const Matrix& macierz2);
+Matrix usuwanieBloczkow(Matrix& Macierz, int rows, int cols);
+bool czyWygrany(int COLUMNS, int ROWS, Matrix Macierz);
+bool czyPrzegrany(Matrix Macierz);
+void wczytajProstokaty(vector<unique_ptr<sf::Drawable>> &ksztalty);
+int licznik(Matrix Macierz, int, int);
+void opadanieBloczkow(Matrix& macierz, set<int> stop, int rows, int cols);
 
 
 int main() {
 
     srand(time(NULL));
 
+    // startowe informacje o planszy
     int CELL_SIZE = 9;
     int COLUMNS = 8;
     int SCREEN_RESIZE = 4;
@@ -29,6 +32,9 @@ int main() {
     // przesuniecie planszy
     int pozY = 240;
     int pozX = 300;
+
+    // set uzyty przy okreslaniu ktore bloczki maja nie spadac w glownej petli
+    set<int> spadanieStop = {101,102,103};
 
     // W zmiennej czcionka mamy czcionke, jezeli chcesz polskie znaki to przed tekstem daj 'L'
     // np. sf::Text text(L"śćżźą", font, 24);
@@ -56,9 +62,9 @@ int main() {
     Bloczek bloczek;
 
     // macierz zawiera w sobie pozycje ruchu tymczasowego bloczka
-    vector<vector<int>> macierz(COLUMNS, vector<int>(ROWS));
+    Matrix macierz(COLUMNS, vector<int>(ROWS));
     // Macierz zawiera w sobie pozycje stałych obiektów
-    vector<vector<int>> Macierz(COLUMNS, vector<int>(ROWS));
+    Matrix Macierz(COLUMNS, vector<int>(ROWS));
 
     // tworzenie okienka
     sf::RenderWindow window(sf::VideoMode(900, 900), "Likaristo", sf::Style::Close);
@@ -187,7 +193,7 @@ int main() {
 
         if(etapGry==1)
         {
-            std::vector<std::unique_ptr<sf::Drawable>> wszystkieKsztalty;
+            vector<unique_ptr<sf::Drawable>> wszystkieKsztalty;
 
             // Tworzenie kształtów, tekstów i dodawanie ich do wektora:
 
@@ -196,25 +202,25 @@ int main() {
             //                        sprite.setTexture(tlo1);
             //                        //sprite.setScale(0.3, 0.3);
             //                        sprite.setTextureRect(sf::IntRect(0, 0, 900, 900));
-            //                        wszystkieKsztalty.emplace_back(std::make_unique<sf::Sprite>(sprite));
+            //                        wszystkieKsztalty.emplace_back(make_unique<sf::Sprite>(sprite));
 
             wczytajProstokaty(wszystkieKsztalty);
 
             sf::Text tryb(L"Ilość Wirusów:", czcionka, 30);
             tryb.setPosition(210.f, 230.f);
-            wszystkieKsztalty.emplace_back(std::make_unique<sf::Text>(tryb));
+            wszystkieKsztalty.emplace_back(make_unique<sf::Text>(tryb));
 
             sf::Text szybkosc(L"Tryb gry:", czcionka, 30);
             szybkosc.setPosition(210.f, 390.f);
-            wszystkieKsztalty.emplace_back(std::make_unique<sf::Text>(szybkosc));
+            wszystkieKsztalty.emplace_back(make_unique<sf::Text>(szybkosc));
 
-            sf::Text tytul("Dr. Mario", czcionka, 70);
+            sf::Text tytul("Likaristo", czcionka, 70);
             tytul.setPosition(250.f, 60.f);
             tytul.setFillColor(sf::Color::Red);
             tytul.setStyle(sf::Text::Style::Bold | sf::Text::Style::Underlined);
             tytul.setOutlineColor(sf::Color::Yellow);
             tytul.setOutlineThickness(5);
-            wszystkieKsztalty.emplace_back(std::make_unique<sf::Text>(tytul));
+            wszystkieKsztalty.emplace_back(make_unique<sf::Text>(tytul));
 
             sf::RectangleShape slider(sf::Vector2f(20, 40));
             slider.setFillColor(sf::Color::Red);
@@ -222,28 +228,28 @@ int main() {
 
             sf::Text tryby(L"1. Tryb łatwy  2. Tryb średni  3. Tryb trudny", czcionka, 24);
             tryby.setPosition(200.f, 465.f);
-            wszystkieKsztalty.emplace_back(std::make_unique<sf::Text>(tryby));
+            wszystkieKsztalty.emplace_back(make_unique<sf::Text>(tryby));
 
             // Wyświetlanie opcji która została wybrana klikając przycisk:
             if(poziomTrudnosci==1)
             {
                 sf::Text poziom(L"Łatwy", czcionka, 25);
                 poziom.setPosition(440.f, 390.f);
-                wszystkieKsztalty.emplace_back(std::make_unique<sf::Text>(poziom));
+                wszystkieKsztalty.emplace_back(make_unique<sf::Text>(poziom));
             }
 
             if(poziomTrudnosci==2)
             {
                 sf::Text poziom(L"Średni", czcionka, 25);
                 poziom.setPosition(440.f, 390.f);
-                wszystkieKsztalty.emplace_back(std::make_unique<sf::Text>(poziom));
+                wszystkieKsztalty.emplace_back(make_unique<sf::Text>(poziom));
             }
 
             if(poziomTrudnosci==3)
             {
                 sf::Text poziom(L"Trudny", czcionka, 25);
                 poziom.setPosition(440.f, 390.f);
-                wszystkieKsztalty.emplace_back(std::make_unique<sf::Text>(poziom));
+                wszystkieKsztalty.emplace_back(make_unique<sf::Text>(poziom));
             }
 
             // Przesuwanie suwakiem jeżeli został kliknięty
@@ -261,17 +267,17 @@ int main() {
                 slider.setPosition(mouseX, pozycjaSuwakY);
                 pozycjaSuwakX=mouseX;
             }
-            wszystkieKsztalty.emplace_back(std::make_unique<sf::RectangleShape>(slider));
+            wszystkieKsztalty.emplace_back(make_unique<sf::RectangleShape>(slider));
 
             // Tworzenie kształtów, tekstów i dodawanie ich do wektora c.d.:
-            sf::Text ilosc(std::to_string(value), czcionka, 30);
+            sf::Text ilosc(to_string(value), czcionka, 30);
             ilosc.setPosition(460.f, 230.f);
-            wszystkieKsztalty.emplace_back(std::make_unique<sf::Text>(ilosc));
+            wszystkieKsztalty.emplace_back(make_unique<sf::Text>(ilosc));
 
             sf::Text graj(L"GRAJ", czcionka, 45);
             graj.setPosition(570.f, 600.f);
             graj.setFillColor(sf::Color::Yellow);
-            wszystkieKsztalty.emplace_back(std::make_unique<sf::Text>(graj));
+            wszystkieKsztalty.emplace_back(make_unique<sf::Text>(graj));
 
             // Wyswietlanie wszystkiego z wektora:
             window.clear(sf::Color::Black);
@@ -304,6 +310,9 @@ int main() {
 
             // usuwanie bloczkow jesli spelnione sa warunki
             Macierz = usuwanieBloczkow(Macierz, COLUMNS, ROWS);
+
+
+            opadanieBloczkow(Macierz, spadanieStop, COLUMNS, ROWS);
 
             // itercja kolorujaca plansze
             for (int i=0; i< COLUMNS; i++)
@@ -339,8 +348,6 @@ int main() {
                 }
             }
 
-            ///
-
             //iteracja kolorujaca wszystkie pola będące w Macierzy
             for (int i=0; i< COLUMNS; i++)
             {
@@ -370,7 +377,7 @@ int main() {
             sf::Text potw(L"Zostało ci jeszcze:", czcionka, 30);
             potw.setPosition(620.f, 230.f);
             window.draw(potw);
-            sf::Text licz(std::to_string(liczbaPotworkow), czcionka, 35);
+            sf::Text licz(to_string(liczbaPotworkow), czcionka, 35);
             licz.setPosition(660.f, 280.f);
             window.draw(licz);
             wygrany=czyWygrany(COLUMNS, ROWS, Macierz);
@@ -440,7 +447,7 @@ int main() {
                     zb.setPosition(220.f, 310.f);
                     window.draw(zb);
 
-                    sf::Text licz(std::to_string(liczbaPotworkow), czcionka, 35);
+                    sf::Text licz(to_string(liczbaPotworkow), czcionka, 35);
                     licz.setPosition(380.f, 350.f);
                     window.draw(licz);
                 }
@@ -456,13 +463,13 @@ int main() {
 }
 
 
-vector<vector<int>> dodaj_macierze(const vector<vector<int>>& macierz1, const vector<vector<int>>& macierz2) {
+Matrix dodaj_macierze(const Matrix& macierz1, const Matrix& macierz2) {
     // Sprawdzenie wymiarów macierzy
     if (macierz1.size() != macierz2.size() || macierz1[0].size() != macierz2[0].size()) {
         throw invalid_argument("Macierze musza miec takie same wymiary.");
     }
 
-    vector<vector<int>> suma_macierzy;
+    Matrix suma_macierzy;
     suma_macierzy.reserve(macierz1.size());
 
     for (size_t i = 0; i < macierz1.size(); ++i) {
@@ -480,9 +487,9 @@ vector<vector<int>> dodaj_macierze(const vector<vector<int>>& macierz1, const ve
     return suma_macierzy;
 }
 
-vector<vector<int>> usuwanieBloczkow(vector<vector<int>>& Macierz, int rows, int cols)
+Matrix usuwanieBloczkow(Matrix& Macierz, int rows, int cols)
 {
-    vector<vector<int>> tempMacierz = Macierz;
+    Matrix tempMacierz = Macierz;
 
     for (int i=0; i< rows; i++)
     {
@@ -535,7 +542,7 @@ vector<vector<int>> usuwanieBloczkow(vector<vector<int>>& Macierz, int rows, int
     return Macierz;
 }
 
-bool czyWygrany(int COLUMNS, int ROWS, vector<vector<int>> Macierz)
+bool czyWygrany(int COLUMNS, int ROWS, Matrix Macierz)
 {
     for (int i=0; i< COLUMNS; i++)
     {
@@ -549,14 +556,14 @@ bool czyWygrany(int COLUMNS, int ROWS, vector<vector<int>> Macierz)
     }
     return true;
 }
-bool czyPrzegrany(vector<vector<int>> Macierz)
+bool czyPrzegrany(Matrix Macierz)
 {
     if(Macierz[3][0]!=0)
         return true;
     else
         return false;
 }
-int licznik(vector<vector<int>> Macierz, int COLUMNS, int ROWS)
+int licznik(Matrix Macierz, int COLUMNS, int ROWS)
 {
     int a=0;
     for (int i=0; i< COLUMNS; i++)
@@ -573,30 +580,41 @@ int licznik(vector<vector<int>> Macierz, int COLUMNS, int ROWS)
 }
 
 
-void wczytajProstokaty(std::vector<std::unique_ptr<sf::Drawable>> &ksztalty)
+void wczytajProstokaty(vector<unique_ptr<sf::Drawable> > &ksztalty)
 {
     sf::RectangleShape prostokat1(sf::Vector2f(145.0, 45.0));
     prostokat1.setPosition(200.0, 460.0);
     prostokat1.setFillColor(sf::Color::Green);
-    ksztalty.emplace_back(std::make_unique<sf::RectangleShape>(prostokat1));
+    ksztalty.emplace_back(make_unique<sf::RectangleShape>(prostokat1));
 
     sf::RectangleShape prostokat2(sf::Vector2f(170.0, 45.0));
     prostokat2.setPosition(345.0, 460.0);
     prostokat2.setFillColor(sf::Color::Blue);
-    ksztalty.emplace_back(std::make_unique<sf::RectangleShape>(prostokat2));
+    ksztalty.emplace_back(make_unique<sf::RectangleShape>(prostokat2));
 
     sf::RectangleShape prostokat3(sf::Vector2f(170.0, 45.0));
     prostokat3.setPosition(515.0, 460.0);
     prostokat3.setFillColor(sf::Color::Red);
-    ksztalty.emplace_back(std::make_unique<sf::RectangleShape>(prostokat3));
+    ksztalty.emplace_back(make_unique<sf::RectangleShape>(prostokat3));
 
     sf::RectangleShape track(sf::Vector2f(400, 10));
     track.setFillColor(sf::Color::White);
     track.setPosition(200, 300);
-    ksztalty.emplace_back(std::make_unique<sf::RectangleShape>(track));
+    ksztalty.emplace_back(make_unique<sf::RectangleShape>(track));
 
     sf::RectangleShape przyciskGraj(sf::Vector2f(170, 80));
     przyciskGraj.setFillColor(sf::Color::Red);
     przyciskGraj.setPosition(550, 590);
-    ksztalty.emplace_back(std::make_unique<sf::RectangleShape>(przyciskGraj));
+    ksztalty.emplace_back(make_unique<sf::RectangleShape>(przyciskGraj));
+}
+
+void opadanieBloczkow(Matrix& macierz, set<int> stop, int rows, int cols) {
+    for (int i = rows - 1; i > 0; i--) {
+        for (int j = 0; j < cols; j++) {
+            if (macierz[i][j] == 0 && stop.find(macierz[i - 1][j]) != stop.end()) {
+                macierz[i][j] = macierz[i - 1][j];
+                macierz[i - 1][j] = 0;
+            }
+        }
+    }
 }
