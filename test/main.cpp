@@ -16,7 +16,7 @@ bool czyWygrany(int COLUMNS, int ROWS, Matrix Macierz);
 bool czyPrzegrany(Matrix Macierz);
 void wczytajProstokaty(vector<unique_ptr<sf::Drawable>> &ksztalty);
 int licznik(Matrix Macierz, int, int);
-Matrix opadanieBloczkow(Matrix& macierz, set<int> stop, int rows, int cols);
+Matrix opadanieBloczkow(Matrix &macierz, int rows, int cols);
 
 
 int main() {
@@ -79,6 +79,7 @@ int main() {
     int poziomTrudnosci;
 
     int liczbaPotworkow;
+    int liczbaProb=0;
 
     bool wygrany=false;
     bool przegrany=false;
@@ -203,6 +204,7 @@ int main() {
                     w.wyczyscPozycje();
                     Potwory potwory(value);
                     Macierz = potwory.DodajDoMacierzy(Macierz);
+                    liczbaProb=0;
                 }
 
                 if (przegrany || wygrany) {
@@ -358,9 +360,10 @@ int main() {
                 window.draw(*s);
             }
 
+            int odswiezanie = (400/poziomTrudnosci);
             // generowanie nowego bloczka, ruch bloczka, dodanie go do Macierzy, gdy sie zatrzyma
             sf::Time czas = clock.getElapsedTime();
-            if(czas.asMilliseconds()>(300) && przegrany==false && wygrany==false)
+            if(czas.asMilliseconds()>(odswiezanie) && przegrany==false && wygrany==false)
             {
                 clock.restart();
 
@@ -368,16 +371,17 @@ int main() {
                 {
                     // Dodaje do zmiennej Macierz nowe dwa elementy ktore sa efektem bloczka, ktory dopiero co spaadl
                     Macierz = dodaj_macierze(Macierz, macierz);
+                    bloczek.usun(macierz, COLUMNS, ROWS);
+                    Macierz = usuwanieBloczkow(Macierz, COLUMNS, ROWS);
+                    Macierz = opadanieBloczkow(Macierz, ROWS, COLUMNS);
+                    liczbaProb++;
                     // Ustawia wszystkie parametry domyslnie
                     bloczek.nowy();
                 }
             }
 
             // usuwanie bloczkow jesli spelnione sa warunki
-            Macierz = usuwanieBloczkow(Macierz, COLUMNS, ROWS);
 
-
-            Macierz = opadanieBloczkow(Macierz, spadanieStop, ROWS, COLUMNS);
 
             // itercja kolorujaca plansze
             for (int i=0; i< COLUMNS; i++)
@@ -446,6 +450,12 @@ int main() {
             sf::Text licz(to_string(liczbaPotworkow), czcionka, 35);
             licz.setPosition(700.f, 280.f);
             window.draw(licz);
+            sf::Text pro(L"Proba", czcionka, 30);
+            pro.setPosition(580.f, 300.f);
+            window.draw(pro);
+            sf::Text pr(to_string(liczbaProb), czcionka, 35);
+            pr.setPosition(700.f, 330.f);
+            window.draw(pr);
             wygrany=czyWygrany(COLUMNS, ROWS, Macierz);
             przegrany=czyPrzegrany(Macierz);
 
@@ -466,6 +476,13 @@ int main() {
                     sf::Text wygr(L"WYGRALES", czcionka, 30);
                     wygr.setPosition(210.f, 230.f);
                     window.draw(wygr);
+
+                    sf::Text wyn(L"Wynik", czcionka, 30);
+                    wyn.setPosition(220.f, 290.f);
+                    window.draw(wyn);
+                    sf::Text pr(to_string(liczbaProb), czcionka, 35);
+                    pr.setPosition(240.f, 315.f);
+                    window.draw(pr);
 
                     for(const auto &s : sprajtyKon) {
                         window.draw(*s);
@@ -562,27 +579,20 @@ Matrix dodaj_macierze(const Matrix& macierz1, const Matrix& macierz2) {
     return suma_macierzy;
 }
 
+
 Matrix usuwanieBloczkow(Matrix& Macierz, int rows, int cols)
 {
     Matrix tempMacierz = Macierz;
 
-    for (int i=0; i< rows; i++)
-    {
-        for(int j=0; j < cols; j++)
-        {
-            while(tempMacierz[i][j]>100)
-            {
-                tempMacierz[i][j] -= 100;
-            }
-
-        }
-    }
     // Sprawdź wiersze
     for (auto& row : tempMacierz) {
         int licznik = 1;
         int poprzedniNumer = row[0];
+
+        if(poprzedniNumer<100)
+            poprzedniNumer=poprzedniNumer+100;
         for (size_t i = 1; i < row.size(); i++) {
-            if (row[i] == poprzedniNumer) {
+            if (row[i] == poprzedniNumer || row[i]+100==poprzedniNumer) {
                 licznik++;
                 if (licznik >= 4) {
                     for (size_t j = i - licznik + 1; j <= i; j++) {
@@ -592,6 +602,8 @@ Matrix usuwanieBloczkow(Matrix& Macierz, int rows, int cols)
             } else {
                 licznik = 1;
                 poprzedniNumer = row[i];
+                if(poprzedniNumer<100)
+                    poprzedniNumer=poprzedniNumer+100;
             }
         }
     }
@@ -600,8 +612,10 @@ Matrix usuwanieBloczkow(Matrix& Macierz, int rows, int cols)
     for (int j = 0; j < cols; j++) {
         int licznik = 1;
         int poprzedniNumer = tempMacierz[0][j];
+        if(poprzedniNumer<100)
+            poprzedniNumer=poprzedniNumer+100;
         for (int i = 1; i < rows; i++) {
-            if (tempMacierz[i][j] == poprzedniNumer) {
+            if (tempMacierz[i][j] == poprzedniNumer || tempMacierz[i][j]+100 == poprzedniNumer) {
                 licznik++;
                 if (licznik >= 4) {
                     for (int k = i - licznik + 1; k <= i; k++) {
@@ -611,12 +625,13 @@ Matrix usuwanieBloczkow(Matrix& Macierz, int rows, int cols)
             } else {
                 licznik = 1;
                 poprzedniNumer = tempMacierz[i][j];
+                if(poprzedniNumer<100)
+                    poprzedniNumer=poprzedniNumer+100;
             }
         }
     }
     return Macierz;
 }
-
 bool czyWygrany(int COLUMNS, int ROWS, Matrix Macierz)
 {
     for (int i=0; i< COLUMNS; i++)
@@ -683,14 +698,57 @@ void wczytajProstokaty(vector<unique_ptr<sf::Drawable> > &ksztalty)
     ksztalty.emplace_back(make_unique<sf::RectangleShape>(przyciskGraj));
 }
 
-Matrix opadanieBloczkow(Matrix& macierz, set<int> stop, int rows, int cols) {
+Matrix opadanieBloczkow(Matrix& macierz, int rows, int cols) {
     for (int i = 0; i < cols; i++) {
         for (int j = rows - 1; j > 0; j--) {
 
-            if (macierz[i][j] == 0 && stop.find(macierz[i][j-1]) != stop.end()) {
-                macierz[i][j] = macierz[i ][j-1];
-                macierz[i][j-1] = 0;
+            int k=0;
+            if(i==cols-1)
+            {
+                if(macierz[i][j-1]<100 && macierz[i][j-1]>0  && macierz[i-1][j-1]==0){
+                    if (macierz[i][j] == 0) {
+                        k=j;
+                        do
+                        {
+                            macierz[i][k] = macierz[i][k-1];
+                            macierz[i][k-1] = 0;
+                            k++;
+                        } while (k<rows-1 && macierz[i][k]==0);
+
+                    }
+                }
             }
+            if(i==0)
+            {
+                if(macierz[i][j-1]<100 && macierz[i][j-1]>0  && macierz[i+1][j-1]==0){
+                    if (macierz[i][j] == 0) {
+                        k=j;
+                        do
+                        {
+                            macierz[i][k] = macierz[i][k-1];
+                            macierz[i][k-1] = 0;
+                            k++;
+                        } while (k<rows-1 && macierz[i][k]==0);
+
+                    }
+                }
+            }
+            if(i<cols-1)
+            {
+                if(macierz[i][j-1]<100 && macierz[i][j-1]>0 && macierz[i+1][j-1]==0 && macierz[i-1][j-1]==0){
+                    if (macierz[i][j] == 0) {
+                        k=j;
+                        do
+                        {
+                            macierz[i][k] = macierz[i][k-1];
+                            macierz[i][k-1] = 0;
+                            k++;
+                        } while (k<rows && macierz[i][k]==0);
+
+                    }
+                }
+            }
+
         }
     }
     return macierz;

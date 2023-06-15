@@ -16,6 +16,7 @@ public:
     void obrocLewo(std::vector<std::vector<int> > Macierz);
     void obrocPrawo(std::vector<std::vector<int> > Macierz);
     void Pauza();
+    void usun(std::vector<std::vector<int>> &macierz, int COLUMNS, int ROWS);
 private:
     std::vector<std::vector<int>> wektor;
     int pozycja =3;
