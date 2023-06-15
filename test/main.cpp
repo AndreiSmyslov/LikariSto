@@ -6,12 +6,13 @@
 #include <cstdlib>
 #include <vector>
 #include <set>
+#include <fstream>
 
 using namespace std;
 using Matrix = vector<vector<int>>;
 
 Matrix dodaj_macierze(const Matrix& macierz1, const Matrix& macierz2);
-Matrix usuwanieBloczkow(Matrix& Macierz, int rows, int cols);
+Matrix usuwanieBloczkow(Matrix& Macierz, int rows, int cols, int &liczbaZbic);
 bool czyWygrany(int COLUMNS, int ROWS, Matrix Macierz);
 bool czyPrzegrany(Matrix Macierz);
 void wczytajProstokaty(vector<unique_ptr<sf::Drawable>> &ksztalty);
@@ -32,6 +33,9 @@ int main() {
     // przesuniecie planszy
     int pozY = 240;
     int pozX = 160;
+
+
+    std::vector<int> liczby;
 
     // set uzyty przy okreslaniu ktore bloczki maja nie spadac w glownej petli
     set<int> spadanieStop = {101,102,103};
@@ -59,9 +63,13 @@ int main() {
 
     int liczbaPotworkow;
     int liczbaProb=0;
+    int liczbaZbic=0;
+    int wynikKoncowy=0;
 
     bool wygrany=false;
     bool przegrany=false;
+    bool zapis = true;
+
 
 
     Bloczek bloczek;
@@ -275,14 +283,17 @@ int main() {
                         liczbaProb2=0;
                     }
                     liczbaProb=0;
+                    zapis=true;
+                    liczbaZbic=0;
+                    wynikKoncowy=0;
                 }
 
                 if (przegrany || wygrany) {
                     sf::RectangleShape prostokat1(sf::Vector2f(220.0, 60.0));
-                    prostokat1.setPosition(200.0, 460.0);
+                    prostokat1.setPosition(200.0, 550.0);
 
                     sf::RectangleShape prostokat2(sf::Vector2f(220.0, 60.0));
-                    prostokat2.setPosition(420.0, 460.0);
+                    prostokat2.setPosition(420.0, 550.0);
 
                     if (prostokat1.getGlobalBounds().contains(mousePosition)) {
                         wygrany=false;
@@ -476,7 +487,8 @@ int main() {
                     // Dodaje do zmiennej Macierz nowe dwa elementy ktore sa efektem bloczka, ktory dopiero co spaadl
                     Macierz = dodaj_macierze(Macierz, macierz);
                     bloczek.usun(macierz, COLUMNS, ROWS);
-                    Macierz = usuwanieBloczkow(Macierz, COLUMNS, ROWS);
+                    Macierz = usuwanieBloczkow(Macierz, COLUMNS, ROWS, liczbaZbic);
+                    Macierz = usuwanieBloczkow(Macierz, COLUMNS, ROWS, liczbaZbic);
                     Macierz = opadanieBloczkow(Macierz, ROWS, COLUMNS);
                     liczbaProb++;
                     // Ustawia wszystkie parametry domyslnie
@@ -568,7 +580,7 @@ int main() {
                         {
                             Sprajty[i][j].setTexture(potworFioletowyTextures[1]);
                             if (elapsed.asSeconds() >= 2*animationTime)
-                            clock2.restart();
+                                clock2.restart();
                         }
                         else
                         {
@@ -585,7 +597,7 @@ int main() {
                         {
                             Sprajty[i][j].setTexture(potworMorskiTextures[1]);
                             if (elapsed.asSeconds() >= 2*animationTime)
-                            clock2.restart();
+                                clock2.restart();
                         }
                         else
                         {
@@ -602,7 +614,7 @@ int main() {
                         {
                             Sprajty[i][j].setTexture(potworZoltyTextures[1]);
                             if (elapsed.asSeconds() >= 2*animationTime)
-                            clock2.restart();
+                                clock2.restart();
                         }
                         else
                         {
@@ -901,7 +913,7 @@ int main() {
                     clock1.restart();
             if(wygrany)
             {
-
+                wynikKoncowy=((100*value)+(10*liczbaZbic)+liczbaProb)*poziomTrudnosci;
                 sf::Time czas1 = clock1.getElapsedTime();
                 if(czas1.asMilliseconds()>(1000))
                 {
@@ -917,29 +929,99 @@ int main() {
                     sf::Text wyn(L"Wynik", czcionka, 30);
                     wyn.setPosition(220.f, 290.f);
                     window.draw(wyn);
-                    sf::Text pr(to_string(liczbaProb), czcionka, 35);
+                    sf::Text pr(to_string(wynikKoncowy), czcionka, 35);
                     pr.setPosition(240.f, 315.f);
                     window.draw(pr);
+
+                    if(zapis){
+                        std::ifstream plik("textury/liczby.txt");
+                        if (plik.is_open()) {
+                            int liczba;
+                            liczby.empty();
+
+                            while (plik >> liczba) {
+                                liczby.emplace_back(liczba);
+                            }
+
+                            plik.close();
+                        } else {
+                            std::cout << "Nie można otworzyć pliku." << std::endl;
+                            return 1;
+                        }
+
+                        // Wprowadzenie nowej liczby
+                        int nowaLiczba= wynikKoncowy;
+
+                        bool jestMniejszaLubRowna = false;
+                        for (int liczba : liczby) {
+                            if (nowaLiczba >= liczba) {
+                                jestMniejszaLubRowna = true;
+                                break;
+                            }
+                        }
+
+                        // Aktualizacja pliku, jeśli nowa liczba jest większa/równa
+                        if (jestMniejszaLubRowna) {
+                            liczby.emplace_back(nowaLiczba);
+
+                            // Sortowanie w kolejności malejącej
+                            std::sort(liczby.rbegin(), liczby.rend());
+
+                            // Usunięcie nadmiarowych liczb
+                            while (liczby.size() > 3) {
+                                liczby.pop_back();
+                            }
+
+                            std::ofstream plikWyjsciowy("textury/liczby.txt");
+                            if (plikWyjsciowy.is_open()) {
+                                for (int liczba : liczby) {
+                                    plikWyjsciowy << liczba << std::endl;
+                                }
+                                plikWyjsciowy.close();
+                            }
+                        }
+                        zapis=false;
+                    }
+
+                    sf::Text naj(L"Najlepsze wyniki", czcionka, 30);
+                    naj.setPosition(220.f, 390.f);
+                    window.draw(naj);
+                    int a=liczby[0];
+                    int b=liczby[1];
+                    int c=liczby[2];
+                    std::wstring aText = L"1   " + std::to_wstring(a);
+                    std::wstring bText = L"2   " + std::to_wstring(b);
+                    std::wstring cText = L"3   " + std::to_wstring(c);
+
+                    sf::Text w(aText, czcionka, 35);
+                    w.setPosition(240.f, 420.f);
+                    window.draw(w);
+                    sf::Text wa(bText, czcionka, 35);
+                    wa.setPosition(240.f, 450.f);
+                    window.draw(wa);
+                    sf::Text wr(cText, czcionka, 35);
+                    wr.setPosition(240.f, 480.f);
+                    window.draw(wr);
 
                     for(const auto &s : sprajtyKon) {
                         window.draw(*s);
                     }
                     sf::RectangleShape prostokat1(sf::Vector2f(220.0, 60.0));
-                    prostokat1.setPosition(200.0, 460.0);
+                    prostokat1.setPosition(200.0, 550.0);
                     prostokat1.setFillColor(sf::Color::Green);
                     window.draw(prostokat1);
 
                     sf::RectangleShape prostokat2(sf::Vector2f(220.0, 60.0));
-                    prostokat2.setPosition(420.0, 460.0);
+                    prostokat2.setPosition(420.0, 550.0);
                     prostokat2.setFillColor(sf::Color::Blue);
                     window.draw(prostokat2);
 
                     sf::Text re(L"Sprobuj ponownie", czcionka, 20);
-                    re.setPosition(210.f, 465.f);
+                    re.setPosition(210.f, 555.f);
                     window.draw(re);
 
                     sf::Text wy(L"Wyjdz", czcionka, 20);
-                    wy.setPosition(430.f, 465.f);
+                    wy.setPosition(430.f, 555.f);
                     window.draw(wy);
                 }
             }
@@ -955,21 +1037,21 @@ int main() {
                     window.draw(prz);
 
                     sf::RectangleShape prostokat1(sf::Vector2f(220.0, 60.0));
-                    prostokat1.setPosition(200.0, 460.0);
+                    prostokat1.setPosition(200.0, 550.0);
                     prostokat1.setFillColor(sf::Color::Green);
                     window.draw(prostokat1);
 
                     sf::RectangleShape prostokat2(sf::Vector2f(220.0, 60.0));
-                    prostokat2.setPosition(420.0, 460.0);
+                    prostokat2.setPosition(420.0, 550.0);
                     prostokat2.setFillColor(sf::Color::Blue);
                     window.draw(prostokat2);
 
                     sf::Text re(L"Sprobuj ponownie", czcionka, 20);
-                    re.setPosition(210.f, 465.f);
+                    re.setPosition(210.f, 555.f);
                     window.draw(re);
 
                     sf::Text wy(L"Wyjdz", czcionka, 20);
-                    wy.setPosition(430.f, 465.f);
+                    wy.setPosition(430.f, 555.f);
                     window.draw(wy);
 
                     sf::Text zb(L"Zostalo ci do zbicia jeszcze ", czcionka, 30);
@@ -1120,7 +1202,7 @@ Matrix dodaj_macierze(const Matrix& macierz1, const Matrix& macierz2) {
 }
 
 
-Matrix usuwanieBloczkow(Matrix& Macierz, int rows, int cols)
+Matrix usuwanieBloczkow(Matrix& Macierz, int rows, int cols, int &liczbaZbic)
 {
     Matrix tempMacierz = Macierz;
 
@@ -1135,6 +1217,10 @@ Matrix usuwanieBloczkow(Matrix& Macierz, int rows, int cols)
             if (row[i] == poprzedniNumer || row[i]+100==poprzedniNumer) {
                 licznik++;
                 if (licznik >= 4) {
+                    if(poprzedniNumer!=0 && poprzedniNumer!=100)
+                    {
+                        liczbaZbic++;
+                    }
                     for (size_t j = i - licznik + 1; j <= i; j++) {
                         Macierz[&row - &tempMacierz[0]][j] = 0;
                     }
@@ -1152,12 +1238,17 @@ Matrix usuwanieBloczkow(Matrix& Macierz, int rows, int cols)
     for (int j = 0; j < cols; j++) {
         int licznik = 1;
         int poprzedniNumer = tempMacierz[0][j];
+
         if(poprzedniNumer<100)
             poprzedniNumer=poprzedniNumer+100;
         for (int i = 1; i < rows; i++) {
             if (tempMacierz[i][j] == poprzedniNumer || tempMacierz[i][j]+100 == poprzedniNumer) {
                 licznik++;
                 if (licznik >= 4) {
+                    if(poprzedniNumer!=0 && poprzedniNumer!=100)
+                    {
+                        liczbaZbic++;
+                    }
                     for (int k = i - licznik + 1; k <= i; k++) {
                         Macierz[k][j] = 0;
                     }
