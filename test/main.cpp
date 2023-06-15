@@ -92,6 +92,7 @@ int main() {
     int liczbaPotworkow2;
     string wygranyGracz;
     string przegranyGracz;
+    int liczbaZbic2=0;
 
 
 
@@ -499,7 +500,7 @@ int main() {
                     // Dodaje do zmiennej Macierz nowe dwa elementy ktore sa efektem bloczka, ktory dopiero co spaadl
                     Macierz2 = dodaj_macierze(Macierz2, macierz2);
                     bloczek2.usun(macierz2, COLUMNS, ROWS);
-                    Macierz2 = usuwanieBloczkow(Macierz2, COLUMNS, ROWS);
+                    Macierz2 = usuwanieBloczkow(Macierz2, COLUMNS, ROWS, liczbaZbic2);
                     Macierz2 = opadanieBloczkow(Macierz2, ROWS, COLUMNS);
                     liczbaProb2++;
                     // Ustawia wszystkie parametry domyslnie
