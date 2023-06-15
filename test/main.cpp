@@ -19,6 +19,8 @@ void wczytajProstokaty(vector<unique_ptr<sf::Drawable>> &ksztalty);
 int licznik(Matrix Macierz, int, int);
 Matrix opadanieBloczkow(Matrix &macierz, int rows, int cols);
 vector<vector<sf::Sprite>> stworzSprajty(int cols, int rows);
+void zeruj(Matrix &Macierz, int COLUMNS, int ROWS);
+
 
 int main() {
 
@@ -277,16 +279,23 @@ int main() {
                     Potwory w(1);
                     w.wyczyscPozycje();
                     Potwory potwory(value);
+                    zeruj(Macierz, COLUMNS, ROWS);
                     Macierz = potwory.DodajDoMacierzy(Macierz);
                     if(liczbaGraczy == 2)
                     {
+                        zeruj(Macierz2, COLUMNS, ROWS);
                         Macierz2 = potwory.DodajDoMacierzy(Macierz2);
-                        liczbaProb2=0;
                     }
                     liczbaProb=0;
+                    liczbaPotworkow=0;
                     zapis=true;
                     liczbaZbic=0;
+                    liczbaZbic2=0;
                     wynikKoncowy=0;
+                    liczbaPotworkow2=0;
+                    liczbaProb2=0;
+                    przegrany=false;
+                    wygrany=false;
                 }
 
                 if (przegrany || wygrany) {
@@ -296,6 +305,11 @@ int main() {
                     sf::RectangleShape prostokat2(sf::Vector2f(220.0, 60.0));
                     prostokat2.setPosition(420.0, 550.0);
 
+                    //                    if(liczbaGraczy==2)
+                    //                    {
+                    //                        przegrany=false;
+                    //                        wygrany=false;
+                    //                    }
                     if (prostokat1.getGlobalBounds().contains(mousePosition)) {
                         wygrany=false;
                         clock1.restart();
@@ -508,401 +522,401 @@ int main() {
                 }
             }
             if(liczbaGraczy == 1)
-        {
-            window.draw(butelkaSprite);
-            // itercja kolorujace plansze
-            for (int i=0; i< COLUMNS; i++)
             {
-                for(int j=0; j < ROWS; j++)
+                window.draw(butelkaSprite);
+                // itercja kolorujace plansze
+                for (int i=0; i< COLUMNS; i++)
                 {
-                    if(macierz[i][j]==0)
+                    for(int j=0; j < ROWS; j++)
                     {
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTexture(bloczekTexture);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
-                    }
-                    // czesc iteracji kolorujaca pola ruchu bloczka na bazie macierzy
-                    if(macierz[i][j]==1)
-                    {
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTexture(pigula_fioletowa);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
-                    }
-                    if(macierz[i][j]==2)
-                    {
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTexture(pigula_morska);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
-                    }
-                    if(macierz[i][j]==3)
-                    {
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTexture(pigula_zolta);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
+                        if(macierz[i][j]==0)
+                        {
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTexture(bloczekTexture);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
+                        }
+                        // czesc iteracji kolorujaca pola ruchu bloczka na bazie macierzy
+                        if(macierz[i][j]==1)
+                        {
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTexture(pigula_fioletowa);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
+                        }
+                        if(macierz[i][j]==2)
+                        {
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTexture(pigula_morska);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
+                        }
+                        if(macierz[i][j]==3)
+                        {
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTexture(pigula_zolta);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
+                        }
                     }
                 }
-            }
 
-            sf::Time elapsed = clock2.getElapsedTime();
-            //iteracja kolorujaca wszystkie pola będące w Macierzy
-            for (int i=0; i< COLUMNS; i++)
-            {
-                for(int j=0; j < ROWS; j++)
+                sf::Time elapsed = clock2.getElapsedTime();
+                //iteracja kolorujaca wszystkie pola będące w Macierzy
+                for (int i=0; i< COLUMNS; i++)
                 {
-                    if(Macierz[i][j]==1)
+                    for(int j=0; j < ROWS; j++)
                     {
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTexture(pigula_fioletowa);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
-                    }
-                    if(Macierz[i][j]==2)
-                    {
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTexture(pigula_morska);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
-                    }
-                    if(Macierz[i][j]==3)
-                    {
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTexture(pigula_zolta);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
-                    }
-                    else if (Macierz[i][j] == 101)
-                    {
-                        // Przełączanie między teksturami co określony czas
-                        if (elapsed.asSeconds() >= animationTime)
+                        if(Macierz[i][j]==1)
                         {
-                            Sprajty[i][j].setTexture(potworFioletowyTextures[1]);
-                            if (elapsed.asSeconds() >= 2*animationTime)
-                                clock2.restart();
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTexture(pigula_fioletowa);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
                         }
-                        else
+                        if(Macierz[i][j]==2)
                         {
-                            Sprajty[i][j].setTexture(potworFioletowyTextures[0]);
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTexture(pigula_morska);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
                         }
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
-                    }
-                    else if (Macierz[i][j] == 102)
-                    {
-                        // Przełączanie między teksturami co określony czas
-                        if (elapsed.asSeconds() >= animationTime)
+                        if(Macierz[i][j]==3)
                         {
-                            Sprajty[i][j].setTexture(potworMorskiTextures[1]);
-                            if (elapsed.asSeconds() >= 2*animationTime)
-                                clock2.restart();
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTexture(pigula_zolta);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
                         }
-                        else
+                        else if (Macierz[i][j] == 101)
                         {
-                            Sprajty[i][j].setTexture(potworMorskiTextures[0]);
+                            // Przełączanie między teksturami co określony czas
+                            if (elapsed.asSeconds() >= animationTime)
+                            {
+                                Sprajty[i][j].setTexture(potworFioletowyTextures[1]);
+                                if (elapsed.asSeconds() >= 2*animationTime)
+                                    clock2.restart();
+                            }
+                            else
+                            {
+                                Sprajty[i][j].setTexture(potworFioletowyTextures[0]);
+                            }
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
                         }
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
-                    }
-                    else if (Macierz[i][j] == 103)
-                    {
-                        // Przełączanie między teksturami co określony czas
-                        if (elapsed.asSeconds() >= animationTime)
+                        else if (Macierz[i][j] == 102)
                         {
-                            Sprajty[i][j].setTexture(potworZoltyTextures[1]);
-                            if (elapsed.asSeconds() >= 2*animationTime)
-                                clock2.restart();
+                            // Przełączanie między teksturami co określony czas
+                            if (elapsed.asSeconds() >= animationTime)
+                            {
+                                Sprajty[i][j].setTexture(potworMorskiTextures[1]);
+                                if (elapsed.asSeconds() >= 2*animationTime)
+                                    clock2.restart();
+                            }
+                            else
+                            {
+                                Sprajty[i][j].setTexture(potworMorskiTextures[0]);
+                            }
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
                         }
-                        else
+                        else if (Macierz[i][j] == 103)
                         {
-                            Sprajty[i][j].setTexture(potworZoltyTextures[0]);
+                            // Przełączanie między teksturami co określony czas
+                            if (elapsed.asSeconds() >= animationTime)
+                            {
+                                Sprajty[i][j].setTexture(potworZoltyTextures[1]);
+                                if (elapsed.asSeconds() >= 2*animationTime)
+                                    clock2.restart();
+                            }
+                            else
+                            {
+                                Sprajty[i][j].setTexture(potworZoltyTextures[0]);
+                            }
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
                         }
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
                     }
                 }
             }
-        }
             // dla dwoch gracz
             if(liczbaGraczy == 2)
-        {
+            {
                 window.draw(butelkaSprite3);
-            // itercja kolorujace plansze
-            for (int i=0; i< COLUMNS; i++)
-            {
-                for(int j=0; j < ROWS; j++)
+                // itercja kolorujace plansze
+                for (int i=0; i< COLUMNS; i++)
                 {
-                    if(macierz[i][j]==0)
+                    for(int j=0; j < ROWS; j++)
                     {
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTexture(bloczekTexture);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
-                    }
-                    // czesc iteracji kolorujaca pola ruchu bloczka na bazie macierzy
-                    if(macierz[i][j]==1)
-                    {
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTexture(pigula_fioletowa);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
-                    }
-                    if(macierz[i][j]==2)
-                    {
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTexture(pigula_morska);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
-                    }
-                    if(macierz[i][j]==3)
-                    {
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTexture(pigula_zolta);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
+                        if(macierz[i][j]==0)
+                        {
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTexture(bloczekTexture);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
+                        }
+                        // czesc iteracji kolorujaca pola ruchu bloczka na bazie macierzy
+                        if(macierz[i][j]==1)
+                        {
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTexture(pigula_fioletowa);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
+                        }
+                        if(macierz[i][j]==2)
+                        {
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTexture(pigula_morska);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
+                        }
+                        if(macierz[i][j]==3)
+                        {
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTexture(pigula_zolta);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
+                        }
                     }
                 }
-            }
 
-            sf::Time elapsed = clock2.getElapsedTime();
-            //iteracja kolorujaca wszystkie pola będące w Macierzy
-            for (int i=0; i< COLUMNS; i++)
-            {
-                for(int j=0; j < ROWS; j++)
+                sf::Time elapsed = clock2.getElapsedTime();
+                //iteracja kolorujaca wszystkie pola będące w Macierzy
+                for (int i=0; i< COLUMNS; i++)
                 {
-                    if(Macierz[i][j]==1)
+                    for(int j=0; j < ROWS; j++)
                     {
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTexture(pigula_fioletowa);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
-                    }
-                    if(Macierz[i][j]==2)
-                    {
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTexture(pigula_morska);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
-                    }
-                    if(Macierz[i][j]==3)
-                    {
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTexture(pigula_zolta);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
-                    }
-                    else if (Macierz[i][j] == 101)
-                    {
-                        // Przełączanie między teksturami co określony czas
-                        if (elapsed.asSeconds() >= animationTime)
+                        if(Macierz[i][j]==1)
                         {
-                            Sprajty[i][j].setTexture(potworFioletowyTextures[1]);
-                            if (elapsed.asSeconds() >= 2*animationTime)
-                            clock2.restart();
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTexture(pigula_fioletowa);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
                         }
-                        else
+                        if(Macierz[i][j]==2)
                         {
-                            Sprajty[i][j].setTexture(potworFioletowyTextures[0]);
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTexture(pigula_morska);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
                         }
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
-                    }
-                    else if (Macierz[i][j] == 102)
-                    {
-                        // Przełączanie między teksturami co określony czas
-                        if (elapsed.asSeconds() >= animationTime)
+                        if(Macierz[i][j]==3)
                         {
-                            Sprajty[i][j].setTexture(potworMorskiTextures[1]);
-                            if (elapsed.asSeconds() >= 2*animationTime)
-                            clock2.restart();
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTexture(pigula_zolta);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
                         }
-                        else
+                        else if (Macierz[i][j] == 101)
                         {
-                            Sprajty[i][j].setTexture(potworMorskiTextures[0]);
+                            // Przełączanie między teksturami co określony czas
+                            if (elapsed.asSeconds() >= animationTime)
+                            {
+                                Sprajty[i][j].setTexture(potworFioletowyTextures[1]);
+                                if (elapsed.asSeconds() >= 2*animationTime)
+                                    clock2.restart();
+                            }
+                            else
+                            {
+                                Sprajty[i][j].setTexture(potworFioletowyTextures[0]);
+                            }
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
                         }
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
-                    }
-                    else if (Macierz[i][j] == 103)
-                    {
-                        // Przełączanie między teksturami co określony czas
-                        if (elapsed.asSeconds() >= animationTime)
+                        else if (Macierz[i][j] == 102)
                         {
-                            Sprajty[i][j].setTexture(potworZoltyTextures[1]);
-                            if (elapsed.asSeconds() >= 2*animationTime)
-                            clock2.restart();
+                            // Przełączanie między teksturami co określony czas
+                            if (elapsed.asSeconds() >= animationTime)
+                            {
+                                Sprajty[i][j].setTexture(potworMorskiTextures[1]);
+                                if (elapsed.asSeconds() >= 2*animationTime)
+                                    clock2.restart();
+                            }
+                            else
+                            {
+                                Sprajty[i][j].setTexture(potworMorskiTextures[0]);
+                            }
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
                         }
-                        else
+                        else if (Macierz[i][j] == 103)
                         {
-                            Sprajty[i][j].setTexture(potworZoltyTextures[0]);
+                            // Przełączanie między teksturami co określony czas
+                            if (elapsed.asSeconds() >= animationTime)
+                            {
+                                Sprajty[i][j].setTexture(potworZoltyTextures[1]);
+                                if (elapsed.asSeconds() >= 2*animationTime)
+                                    clock2.restart();
+                            }
+                            else
+                            {
+                                Sprajty[i][j].setTexture(potworZoltyTextures[0]);
+                            }
+                            Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
+                            Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty[i][j]);
                         }
-                        Sprajty[i][j].setPosition(CELL_SIZE * i * 4 + pozX3, CELL_SIZE * j * 4 + pozY);
-                        Sprajty[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty[i][j]);
                     }
                 }
-            }
 
 
-        window.draw(butelkaSprite2);
+                window.draw(butelkaSprite2);
 
-            // itercja kolorujace plansze
-            for (int i=0; i< COLUMNS; i++)
-            {
-                for(int j=0; j < ROWS; j++)
+                // itercja kolorujace plansze
+                for (int i=0; i< COLUMNS; i++)
                 {
-                    if(macierz2[i][j]==0)
+                    for(int j=0; j < ROWS; j++)
                     {
-                        Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
-                        Sprajty2[i][j].setTexture(bloczekTexture);
-                        Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty2[i][j]);
-                    }
-                    // czesc iteracji kolorujaca pola ruchu bloczka na bazie macierzy
-                    if(macierz2[i][j]==1)
-                    {
-                        Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
-                        Sprajty2[i][j].setTexture(pigula_fioletowa);
-                        Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty2[i][j]);
-                    }
-                    if(macierz2[i][j]==2)
-                    {
-                        Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
-                        Sprajty2[i][j].setTexture(pigula_morska);
-                        Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty2[i][j]);
-                    }
-                    if(macierz2[i][j]==3)
-                    {
-                        Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
-                        Sprajty2[i][j].setTexture(pigula_zolta);
-                        Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty2[i][j]);
+                        if(macierz2[i][j]==0)
+                        {
+                            Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
+                            Sprajty2[i][j].setTexture(bloczekTexture);
+                            Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty2[i][j]);
+                        }
+                        // czesc iteracji kolorujaca pola ruchu bloczka na bazie macierzy
+                        if(macierz2[i][j]==1)
+                        {
+                            Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
+                            Sprajty2[i][j].setTexture(pigula_fioletowa);
+                            Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty2[i][j]);
+                        }
+                        if(macierz2[i][j]==2)
+                        {
+                            Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
+                            Sprajty2[i][j].setTexture(pigula_morska);
+                            Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty2[i][j]);
+                        }
+                        if(macierz2[i][j]==3)
+                        {
+                            Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
+                            Sprajty2[i][j].setTexture(pigula_zolta);
+                            Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty2[i][j]);
+                        }
                     }
                 }
-            }
 
-            //iteracja kolorujaca wszystkie pola będące w Macierzy2
-            for (int i=0; i< COLUMNS; i++)
-            {
-                for(int j=0; j < ROWS; j++)
+                //iteracja kolorujaca wszystkie pola będące w Macierzy2
+                for (int i=0; i< COLUMNS; i++)
                 {
-                    if(Macierz2[i][j]==1)
+                    for(int j=0; j < ROWS; j++)
                     {
-                        Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
-                        Sprajty2[i][j].setTexture(pigula_fioletowa);
-                        Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty2[i][j]);
-                    }
-                    if(Macierz2[i][j]==2)
-                    {
-                        Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
-                        Sprajty2[i][j].setTexture(pigula_morska);
-                        Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty2[i][j]);
-                    }
-                    if(Macierz2[i][j]==3)
-                    {
-                        Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
-                        Sprajty2[i][j].setTexture(pigula_zolta);
-                        Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty2[i][j]);
-                    }
-                    else if (Macierz2[i][j] == 101)
-                    {
-                        // Przełączanie między teksturami co określony czas
-                        if (elapsed.asSeconds() >= animationTime)
+                        if(Macierz2[i][j]==1)
                         {
-                            Sprajty2[i][j].setTexture(potworFioletowyTextures[1]);
-                            if (elapsed.asSeconds() >= 2*animationTime)
-                            clock2.restart();
+                            Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
+                            Sprajty2[i][j].setTexture(pigula_fioletowa);
+                            Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty2[i][j]);
                         }
-                        else
+                        if(Macierz2[i][j]==2)
                         {
-                            Sprajty2[i][j].setTexture(potworFioletowyTextures[0]);
+                            Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
+                            Sprajty2[i][j].setTexture(pigula_morska);
+                            Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty2[i][j]);
                         }
-                        Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
-                        Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty2[i][j]);
-                    }
-                    else if (Macierz2[i][j] == 102)
-                    {
-                        // Przełączanie między teksturami co określony czas
-                        if (elapsed.asSeconds() >= animationTime)
+                        if(Macierz2[i][j]==3)
                         {
-                            Sprajty2[i][j].setTexture(potworMorskiTextures[1]);
-                            if (elapsed.asSeconds() >= 2*animationTime)
-                            clock2.restart();
+                            Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
+                            Sprajty2[i][j].setTexture(pigula_zolta);
+                            Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty2[i][j]);
                         }
-                        else
+                        else if (Macierz2[i][j] == 101)
                         {
-                            Sprajty2[i][j].setTexture(potworMorskiTextures[0]);
+                            // Przełączanie między teksturami co określony czas
+                            if (elapsed.asSeconds() >= animationTime)
+                            {
+                                Sprajty2[i][j].setTexture(potworFioletowyTextures[1]);
+                                if (elapsed.asSeconds() >= 2*animationTime)
+                                    clock2.restart();
+                            }
+                            else
+                            {
+                                Sprajty2[i][j].setTexture(potworFioletowyTextures[0]);
+                            }
+                            Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
+                            Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty2[i][j]);
                         }
-                        Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
-                        Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty2[i][j]);
-                    }
-                    else if (Macierz2[i][j] == 103)
-                    {
-                        // Przełączanie między teksturami co określony czas
-                        if (elapsed.asSeconds() >= animationTime)
+                        else if (Macierz2[i][j] == 102)
                         {
-                            Sprajty2[i][j].setTexture(potworZoltyTextures[1]);
-                            if (elapsed.asSeconds() >= 2*animationTime)
-                            clock2.restart();
+                            // Przełączanie między teksturami co określony czas
+                            if (elapsed.asSeconds() >= animationTime)
+                            {
+                                Sprajty2[i][j].setTexture(potworMorskiTextures[1]);
+                                if (elapsed.asSeconds() >= 2*animationTime)
+                                    clock2.restart();
+                            }
+                            else
+                            {
+                                Sprajty2[i][j].setTexture(potworMorskiTextures[0]);
+                            }
+                            Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
+                            Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty2[i][j]);
                         }
-                        else
+                        else if (Macierz2[i][j] == 103)
                         {
-                            Sprajty2[i][j].setTexture(potworZoltyTextures[0]);
+                            // Przełączanie między teksturami co określony czas
+                            if (elapsed.asSeconds() >= animationTime)
+                            {
+                                Sprajty2[i][j].setTexture(potworZoltyTextures[1]);
+                                if (elapsed.asSeconds() >= 2*animationTime)
+                                    clock2.restart();
+                            }
+                            else
+                            {
+                                Sprajty2[i][j].setTexture(potworZoltyTextures[0]);
+                            }
+                            Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
+                            Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
+                            window.draw(Sprajty2[i][j]);
                         }
-                        Sprajty2[i][j].setPosition(CELL_SIZE * i * 4 + pozX2, CELL_SIZE * j * 4 + pozY);
-                        Sprajty2[i][j].setTextureRect(sf::IntRect(0, 0, 6, 6));
-                        window.draw(Sprajty2[i][j]);
                     }
                 }
+
+                liczbaPotworkow=licznik(Macierz, COLUMNS, ROWS);
+                liczbaPotworkow2=licznik(Macierz2, COLUMNS, ROWS);
+                sf::Text potw(L"Potwo", czcionka, 30);
+                potw.setPosition(410.f, 230.f);
+                window.draw(potw);
+                sf::Text licz(to_string(liczbaPotworkow) + "       " + to_string(liczbaPotworkow2), czcionka, 35);
+                licz.setPosition(420.f, 260.f);
+                window.draw(licz);
+                sf::Text pro(L"Proby", czcionka, 30);
+                pro.setPosition(410.f, 300.f);
+                window.draw(pro);
+                sf::Text pr(to_string(liczbaProb) + "       " + to_string(liczbaProb2), czcionka, 35);
+                pr.setPosition(420.f, 330.f);
+                window.draw(pr);
             }
+            // koniec dla dwoch graczy
 
-            liczbaPotworkow=licznik(Macierz, COLUMNS, ROWS);
-            liczbaPotworkow2=licznik(Macierz2, COLUMNS, ROWS);
-            sf::Text potw(L"Potwo", czcionka, 30);
-            potw.setPosition(410.f, 230.f);
-            window.draw(potw);
-            sf::Text licz(to_string(liczbaPotworkow) + "       " + to_string(liczbaPotworkow2), czcionka, 35);
-            licz.setPosition(420.f, 260.f);
-            window.draw(licz);
-            sf::Text pro(L"Proby", czcionka, 30);
-            pro.setPosition(410.f, 300.f);
-            window.draw(pro);
-            sf::Text pr(to_string(liczbaProb) + "       " + to_string(liczbaProb2), czcionka, 35);
-            pr.setPosition(420.f, 330.f);
-            window.draw(pr);
-                    }
-    // koniec dla dwoch graczy
-
-    if(liczbaGraczy ==1)
-    {
-            liczbaPotworkow=licznik(Macierz, COLUMNS, ROWS);
-            sf::Text potw(L"Zostalo ci jeszcze", czcionka, 30);
-            potw.setPosition(580.f, 230.f);
-            window.draw(potw);
-            sf::Text licz(to_string(liczbaPotworkow), czcionka, 35);
-            licz.setPosition(700.f, 280.f);
-            window.draw(licz);
-            sf::Text pro(L"Proba", czcionka, 30);
-            pro.setPosition(580.f, 300.f);
-            window.draw(pro);
-            sf::Text pr(to_string(liczbaProb), czcionka, 35);
-            pr.setPosition(700.f, 330.f);
-            window.draw(pr);
-    }
+            if(liczbaGraczy ==1)
+            {
+                liczbaPotworkow=licznik(Macierz, COLUMNS, ROWS);
+                sf::Text potw(L"Zostalo ci jeszcze", czcionka, 30);
+                potw.setPosition(580.f, 230.f);
+                window.draw(potw);
+                sf::Text licz(to_string(liczbaPotworkow), czcionka, 35);
+                licz.setPosition(700.f, 280.f);
+                window.draw(licz);
+                sf::Text pro(L"Proba", czcionka, 30);
+                pro.setPosition(580.f, 300.f);
+                window.draw(pro);
+                sf::Text pr(to_string(liczbaProb), czcionka, 35);
+                pr.setPosition(700.f, 330.f);
+                window.draw(pr);
+            }
 
 
             if(liczbaGraczy == 1)
@@ -912,158 +926,158 @@ int main() {
 
                 if (przegrany==false && wygrany==false)
                     clock1.restart();
-            if(wygrany)
-            {
-                wynikKoncowy=((100*value)+(10*liczbaZbic)+liczbaProb)*poziomTrudnosci;
-                sf::Time czas1 = clock1.getElapsedTime();
-                if(czas1.asMilliseconds()>(1000))
+                if(wygrany)
                 {
+                    wynikKoncowy=((100*value)+(10*liczbaZbic)+liczbaProb)*poziomTrudnosci;
+                    sf::Time czas1 = clock1.getElapsedTime();
+                    if(czas1.asMilliseconds()>(1000))
+                    {
 
-                    window.clear(sf::Color::Black);
+                        window.clear(sf::Color::Black);
 
-                    window.draw(tloKonSpriteW);
+                        window.draw(tloKonSpriteW);
 
-                    sf::Text wygr(L"WYGRALES", czcionka, 30);
-                    wygr.setPosition(210.f, 230.f);
-                    window.draw(wygr);
+                        sf::Text wygr(L"WYGRALES", czcionka, 30);
+                        wygr.setPosition(210.f, 230.f);
+                        window.draw(wygr);
 
-                    sf::Text wyn(L"Wynik", czcionka, 30);
-                    wyn.setPosition(220.f, 290.f);
-                    window.draw(wyn);
-                    sf::Text pr(to_string(wynikKoncowy), czcionka, 35);
-                    pr.setPosition(240.f, 315.f);
-                    window.draw(pr);
+                        sf::Text wyn(L"Wynik", czcionka, 30);
+                        wyn.setPosition(220.f, 290.f);
+                        window.draw(wyn);
+                        sf::Text pr(to_string(wynikKoncowy), czcionka, 35);
+                        pr.setPosition(240.f, 315.f);
+                        window.draw(pr);
 
-                    if(zapis){
-                        std::ifstream plik("textury/liczby.txt");
-                        if (plik.is_open()) {
-                            int liczba;
-                            liczby.empty();
+                        if(zapis){
+                            std::ifstream plik("textury/liczby.txt");
+                            if (plik.is_open()) {
+                                int liczba;
+                                liczby.empty();
 
-                            while (plik >> liczba) {
-                                liczby.emplace_back(liczba);
-                            }
-
-                            plik.close();
-                        } else {
-                            std::cout << "Nie można otworzyć pliku." << std::endl;
-                            return 1;
-                        }
-
-                        // Wprowadzenie nowej liczby
-                        int nowaLiczba= wynikKoncowy;
-
-                        bool jestMniejszaLubRowna = false;
-                        for (int liczba : liczby) {
-                            if (nowaLiczba >= liczba) {
-                                jestMniejszaLubRowna = true;
-                                break;
-                            }
-                        }
-
-                        // Aktualizacja pliku, jeśli nowa liczba jest większa/równa
-                        if (jestMniejszaLubRowna) {
-                            liczby.emplace_back(nowaLiczba);
-
-                            // Sortowanie w kolejności malejącej
-                            std::sort(liczby.rbegin(), liczby.rend());
-
-                            // Usunięcie nadmiarowych liczb
-                            while (liczby.size() > 3) {
-                                liczby.pop_back();
-                            }
-
-                            std::ofstream plikWyjsciowy("textury/liczby.txt");
-                            if (plikWyjsciowy.is_open()) {
-                                for (int liczba : liczby) {
-                                    plikWyjsciowy << liczba << std::endl;
+                                while (plik >> liczba) {
+                                    liczby.emplace_back(liczba);
                                 }
-                                plikWyjsciowy.close();
+
+                                plik.close();
+                            } else {
+                                std::cout << "Nie można otworzyć pliku." << std::endl;
+                                return 1;
                             }
+
+                            // Wprowadzenie nowej liczby
+                            int nowaLiczba= wynikKoncowy;
+
+                            bool jestMniejszaLubRowna = false;
+                            for (int liczba : liczby) {
+                                if (nowaLiczba >= liczba) {
+                                    jestMniejszaLubRowna = true;
+                                    break;
+                                }
+                            }
+
+                            // Aktualizacja pliku, jeśli nowa liczba jest większa/równa
+                            if (jestMniejszaLubRowna) {
+                                liczby.emplace_back(nowaLiczba);
+
+                                // Sortowanie w kolejności malejącej
+                                std::sort(liczby.rbegin(), liczby.rend());
+
+                                // Usunięcie nadmiarowych liczb
+                                while (liczby.size() > 3) {
+                                    liczby.pop_back();
+                                }
+
+                                std::ofstream plikWyjsciowy("textury/liczby.txt");
+                                if (plikWyjsciowy.is_open()) {
+                                    for (int liczba : liczby) {
+                                        plikWyjsciowy << liczba << std::endl;
+                                    }
+                                    plikWyjsciowy.close();
+                                }
+                            }
+                            zapis=false;
                         }
-                        zapis=false;
+
+                        sf::Text naj(L"Najlepsze wyniki", czcionka, 30);
+                        naj.setPosition(220.f, 390.f);
+                        window.draw(naj);
+                        int a=liczby[0];
+                        int b=liczby[1];
+                        int c=liczby[2];
+                        std::wstring aText = L"1   " + std::to_wstring(a);
+                        std::wstring bText = L"2   " + std::to_wstring(b);
+                        std::wstring cText = L"3   " + std::to_wstring(c);
+
+                        sf::Text w(aText, czcionka, 35);
+                        w.setPosition(240.f, 420.f);
+                        window.draw(w);
+                        sf::Text wa(bText, czcionka, 35);
+                        wa.setPosition(240.f, 450.f);
+                        window.draw(wa);
+                        sf::Text wr(cText, czcionka, 35);
+                        wr.setPosition(240.f, 480.f);
+                        window.draw(wr);
+
+                        for(const auto &s : sprajtyKon) {
+                            window.draw(*s);
+                        }
+                        sf::RectangleShape prostokat1(sf::Vector2f(220.0, 60.0));
+                        prostokat1.setPosition(200.0, 550.0);
+                        prostokat1.setFillColor(sf::Color::Green);
+                        window.draw(prostokat1);
+
+                        sf::RectangleShape prostokat2(sf::Vector2f(220.0, 60.0));
+                        prostokat2.setPosition(420.0, 550.0);
+                        prostokat2.setFillColor(sf::Color::Blue);
+                        window.draw(prostokat2);
+
+                        sf::Text re(L"Sprobuj ponownie", czcionka, 20);
+                        re.setPosition(210.f, 555.f);
+                        window.draw(re);
+
+                        sf::Text wy(L"Wyjdz", czcionka, 20);
+                        wy.setPosition(430.f, 555.f);
+                        window.draw(wy);
                     }
-
-                    sf::Text naj(L"Najlepsze wyniki", czcionka, 30);
-                    naj.setPosition(220.f, 390.f);
-                    window.draw(naj);
-                    int a=liczby[0];
-                    int b=liczby[1];
-                    int c=liczby[2];
-                    std::wstring aText = L"1   " + std::to_wstring(a);
-                    std::wstring bText = L"2   " + std::to_wstring(b);
-                    std::wstring cText = L"3   " + std::to_wstring(c);
-
-                    sf::Text w(aText, czcionka, 35);
-                    w.setPosition(240.f, 420.f);
-                    window.draw(w);
-                    sf::Text wa(bText, czcionka, 35);
-                    wa.setPosition(240.f, 450.f);
-                    window.draw(wa);
-                    sf::Text wr(cText, czcionka, 35);
-                    wr.setPosition(240.f, 480.f);
-                    window.draw(wr);
-
-                    for(const auto &s : sprajtyKon) {
-                        window.draw(*s);
-                    }
-                    sf::RectangleShape prostokat1(sf::Vector2f(220.0, 60.0));
-                    prostokat1.setPosition(200.0, 550.0);
-                    prostokat1.setFillColor(sf::Color::Green);
-                    window.draw(prostokat1);
-
-                    sf::RectangleShape prostokat2(sf::Vector2f(220.0, 60.0));
-                    prostokat2.setPosition(420.0, 550.0);
-                    prostokat2.setFillColor(sf::Color::Blue);
-                    window.draw(prostokat2);
-
-                    sf::Text re(L"Sprobuj ponownie", czcionka, 20);
-                    re.setPosition(210.f, 555.f);
-                    window.draw(re);
-
-                    sf::Text wy(L"Wyjdz", czcionka, 20);
-                    wy.setPosition(430.f, 555.f);
-                    window.draw(wy);
                 }
-            }
-            if(przegrany)
-            {
-                sf::Time czas1 = clock1.getElapsedTime();
-                if(czas1.asMilliseconds()>(1000))
+                if(przegrany)
                 {
-                    window.clear(sf::Color::Black);
-                    window.draw(tloKonSpriteL);
-                    sf::Text prz(L"PRZEGRALES", czcionka, 30);
-                    prz.setPosition(210.f, 230.f);
-                    window.draw(prz);
+                    sf::Time czas1 = clock1.getElapsedTime();
+                    if(czas1.asMilliseconds()>(1000))
+                    {
+                        window.clear(sf::Color::Black);
+                        window.draw(tloKonSpriteL);
+                        sf::Text prz(L"PRZEGRALES", czcionka, 30);
+                        prz.setPosition(210.f, 230.f);
+                        window.draw(prz);
 
-                    sf::RectangleShape prostokat1(sf::Vector2f(220.0, 60.0));
-                    prostokat1.setPosition(200.0, 550.0);
-                    prostokat1.setFillColor(sf::Color::Green);
-                    window.draw(prostokat1);
+                        sf::RectangleShape prostokat1(sf::Vector2f(220.0, 60.0));
+                        prostokat1.setPosition(200.0, 550.0);
+                        prostokat1.setFillColor(sf::Color::Green);
+                        window.draw(prostokat1);
 
-                    sf::RectangleShape prostokat2(sf::Vector2f(220.0, 60.0));
-                    prostokat2.setPosition(420.0, 550.0);
-                    prostokat2.setFillColor(sf::Color::Blue);
-                    window.draw(prostokat2);
+                        sf::RectangleShape prostokat2(sf::Vector2f(220.0, 60.0));
+                        prostokat2.setPosition(420.0, 550.0);
+                        prostokat2.setFillColor(sf::Color::Blue);
+                        window.draw(prostokat2);
 
-                    sf::Text re(L"Sprobuj ponownie", czcionka, 20);
-                    re.setPosition(210.f, 555.f);
-                    window.draw(re);
+                        sf::Text re(L"Sprobuj ponownie", czcionka, 20);
+                        re.setPosition(210.f, 555.f);
+                        window.draw(re);
 
-                    sf::Text wy(L"Wyjdz", czcionka, 20);
-                    wy.setPosition(430.f, 555.f);
-                    window.draw(wy);
+                        sf::Text wy(L"Wyjdz", czcionka, 20);
+                        wy.setPosition(430.f, 555.f);
+                        window.draw(wy);
 
-                    sf::Text zb(L"Zostalo ci do zbicia jeszcze ", czcionka, 30);
-                    zb.setPosition(220.f, 310.f);
-                    window.draw(zb);
+                        sf::Text zb(L"Zostalo ci do zbicia jeszcze ", czcionka, 30);
+                        zb.setPosition(220.f, 310.f);
+                        window.draw(zb);
 
-                    sf::Text licz(to_string(liczbaPotworkow), czcionka, 35);
-                    licz.setPosition(380.f, 350.f);
-                    window.draw(licz);
+                        sf::Text licz(to_string(liczbaPotworkow), czcionka, 35);
+                        licz.setPosition(380.f, 350.f);
+                        window.draw(licz);
+                    }
                 }
-            }
             }
             if(liczbaGraczy == 2)
             {
@@ -1085,44 +1099,44 @@ int main() {
 
 
                     if(czas1.asMilliseconds()>(1000))
-                                        {
+                    {
 
-                                            window.clear(sf::Color::Black);
+                        window.clear(sf::Color::Black);
 
-                                            window.draw(tloKonSpriteW);
+                        window.draw(tloKonSpriteW);
 
-                                            sf::Text wygr("WYGRAL"+ wygranyGracz, czcionka, 30);
-                                            wygr.setPosition(210.f, 230.f);
-                                            window.draw(wygr);
+                        sf::Text wygr("WYGRAL"+ wygranyGracz, czcionka, 30);
+                        wygr.setPosition(210.f, 230.f);
+                        window.draw(wygr);
 
-                                            sf::Text wyn(L"Wynik", czcionka, 30);
-                                            wyn.setPosition(220.f, 290.f);
-                                            window.draw(wyn);
-                                            sf::Text pr(to_string(liczbaProb) + "                        " +to_string(liczbaProb2), czcionka, 35);
-                                            pr.setPosition(240.f, 315.f);
-                                            window.draw(pr);
+                        sf::Text wyn(L"Wynik", czcionka, 30);
+                        wyn.setPosition(220.f, 290.f);
+                        window.draw(wyn);
+                        sf::Text pr(to_string(liczbaProb) + "                        " +to_string(liczbaProb2), czcionka, 35);
+                        pr.setPosition(240.f, 315.f);
+                        window.draw(pr);
 
-                                            for(const auto &s : sprajtyKon) {
-                                                window.draw(*s);
-                                            }
-                                            sf::RectangleShape prostokat1(sf::Vector2f(220.0, 60.0));
-                                            prostokat1.setPosition(200.0, 550.0);
-                                            prostokat1.setFillColor(sf::Color::Green);
-                                            window.draw(prostokat1);
+                        for(const auto &s : sprajtyKon) {
+                            window.draw(*s);
+                        }
+                        sf::RectangleShape prostokat1(sf::Vector2f(220.0, 60.0));
+                        prostokat1.setPosition(200.0, 550.0);
+                        prostokat1.setFillColor(sf::Color::Green);
+                        window.draw(prostokat1);
 
-                                            sf::RectangleShape prostokat2(sf::Vector2f(220.0, 60.0));
-                                            prostokat2.setPosition(420.0, 550.0);
-                                            prostokat2.setFillColor(sf::Color::Blue);
-                                            window.draw(prostokat2);
+                        sf::RectangleShape prostokat2(sf::Vector2f(220.0, 60.0));
+                        prostokat2.setPosition(420.0, 550.0);
+                        prostokat2.setFillColor(sf::Color::Blue);
+                        window.draw(prostokat2);
 
-                                            sf::Text re(L"Sprobuj ponownie", czcionka, 20);
-                                            re.setPosition(210.f, 555.f);
-                                            window.draw(re);
+                        sf::Text re(L"Sprobuj ponownie", czcionka, 20);
+                        re.setPosition(210.f, 555.f);
+                        window.draw(re);
 
-                                            sf::Text wy(L"Wyjdz", czcionka, 20);
-                                            wy.setPosition(430.f, 555.f);
-                                            window.draw(wy);
-                                        }
+                        sf::Text wy(L"Wyjdz", czcionka, 20);
+                        wy.setPosition(430.f, 555.f);
+                        window.draw(wy);
+                    }
                 }
 
 
@@ -1136,39 +1150,39 @@ int main() {
 
                     sf::Time czas1 = clock1.getElapsedTime();
                     if(czas1.asMilliseconds()>(1000))
-                                        {
-                                            window.clear(sf::Color::Black);
-                                            window.draw(tloKonSpriteL);
-                                            sf::Text prz("PRZEGRAL" + przegranyGracz, czcionka, 30);
-                                            prz.setPosition(210.f, 230.f);
-                                            window.draw(prz);
+                    {
+                        window.clear(sf::Color::Black);
+                        window.draw(tloKonSpriteL);
+                        sf::Text prz("PRZEGRAL" + przegranyGracz, czcionka, 30);
+                        prz.setPosition(210.f, 230.f);
+                        window.draw(prz);
 
-                                            sf::RectangleShape prostokat1(sf::Vector2f(220.0, 60.0));
-                                            prostokat1.setPosition(200.0, 550.0);
-                                            prostokat1.setFillColor(sf::Color::Green);
-                                            window.draw(prostokat1);
+                        sf::RectangleShape prostokat1(sf::Vector2f(220.0, 60.0));
+                        prostokat1.setPosition(200.0, 550.0);
+                        prostokat1.setFillColor(sf::Color::Green);
+                        window.draw(prostokat1);
 
-                                            sf::RectangleShape prostokat2(sf::Vector2f(220.0, 60.0));
-                                            prostokat2.setPosition(420.0, 550.0);
-                                            prostokat2.setFillColor(sf::Color::Blue);
-                                            window.draw(prostokat2);
+                        sf::RectangleShape prostokat2(sf::Vector2f(220.0, 60.0));
+                        prostokat2.setPosition(420.0, 550.0);
+                        prostokat2.setFillColor(sf::Color::Blue);
+                        window.draw(prostokat2);
 
-                                            sf::Text re(L"Sprobuj ponownie", czcionka, 20);
-                                            re.setPosition(210.f, 555.f);
-                                            window.draw(re);
+                        sf::Text re(L"Sprobuj ponownie", czcionka, 20);
+                        re.setPosition(210.f, 555.f);
+                        window.draw(re);
 
-                                            sf::Text wy(L"Wyjdz", czcionka, 20);
-                                            wy.setPosition(430.f, 555.f);
-                                            window.draw(wy);
+                        sf::Text wy(L"Wyjdz", czcionka, 20);
+                        wy.setPosition(430.f, 555.f);
+                        window.draw(wy);
 
-                                            sf::Text zb(L"Zostalo ci do zbicia jeszcze ", czcionka, 30);
-                                            zb.setPosition(220.f, 310.f);
-                                            window.draw(zb);
+                        sf::Text zb(L"Zostalo ci do zbicia jeszcze ", czcionka, 30);
+                        zb.setPosition(220.f, 310.f);
+                        window.draw(zb);
 
-                                            sf::Text licz(to_string(liczbaPotworkow) + "                        " +to_string(liczbaPotworkow2), czcionka, 35);
-                                            licz.setPosition(380.f, 350.f);
-                                            window.draw(licz);
-                                        }
+                        sf::Text licz(to_string(liczbaPotworkow) + "                        " +to_string(liczbaPotworkow2), czcionka, 35);
+                        licz.setPosition(380.f, 350.f);
+                        window.draw(licz);
+                    }
                 }
             }
 
@@ -1421,4 +1435,15 @@ std::vector<std::vector<sf::Sprite>> stworzSprajty(int cols, int rows)
     }
 
     return sprajty;
+}
+
+void zeruj(Matrix &Macierz, int COLUMNS, int ROWS)
+{
+    for (int i=0; i< COLUMNS; i++)
+    {
+        for(int j=0; j < ROWS; j++)
+        {
+            Macierz[i][j]=0;
+        }
+    }
 }
