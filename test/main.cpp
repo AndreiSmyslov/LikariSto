@@ -21,6 +21,30 @@ Matrix opadanieBloczkow(Matrix& macierz, set<int> stop, int rows, int cols);
 
 int main() {
 
+
+    sf::Texture pigula_zolta;
+    if (!pigula_zolta.loadFromFile("textury/pigula_zolta_texture.png")) {
+        std::cerr << "Błąd podczas wczytywania tekstury 1." << std::endl;
+        return -1;
+    }
+
+    sf::Texture pigula_fioletowa;
+    if (!pigula_zolta.loadFromFile("textury/pigula_fioletowa_texture.png")) {
+        std::cerr << "Błąd podczas wczytywania tekstury 2." << std::endl;
+        return -1;
+    }
+
+    sf::Texture pigula_morska;
+    if (!pigula_zolta.loadFromFile("textury/pigula_morski_texture.png")) {
+        std::cerr << "Błąd podczas wczytywania tekstury 3." << std::endl;
+        return -1;
+    }
+
+    sf::Sprite sprite;
+    sprite.setScale(5.4,5.4);
+
+
+
     srand(time(NULL));
 
     // startowe informacje o planszy
@@ -72,6 +96,7 @@ int main() {
     // rectangle kwadratem będącym kratka na plaszy
     sf::RectangleShape rectangle(sf::Vector2f(CELL_SIZE*SCREEN_RESIZE-1, CELL_SIZE*SCREEN_RESIZE-1));
 
+
     // wektor spritów i inicjalizacja tekstów
     std::vector<std::unique_ptr<sf::Sprite>> sprajtyMain;
     std::vector<std::unique_ptr<sf::Sprite>> sprajtyKon;
@@ -112,6 +137,7 @@ int main() {
     sf::Sprite tloKonSpriteL;
     tloKonSpriteL.setTexture(tloKonTexture2);
     tloKonSpriteL.setTextureRect(sf::IntRect(0, 0, 900, 900));
+
 
 
 
@@ -173,6 +199,8 @@ int main() {
                 if ((przyciskGraj.getGlobalBounds().contains(mousePosition)) && (poziomTrudnosci!=0)) {
                     etapGry=2;
                     // inicjalizacja potworow i dodanie ich do Macierzy
+                    Potwory w(1);
+                    w.wyczyscPozycje();
                     Potwory potwory(value);
                     Macierz = potwory.DodajDoMacierzy(Macierz);
                 }
@@ -237,15 +265,6 @@ int main() {
         if(etapGry==1)
         {
             vector<unique_ptr<sf::Drawable>> wszystkieKsztalty;
-
-            // Tworzenie kształtów, tekstów i dodawanie ich do wektora:
-
-            //                        tlo1.setRepeated(true);
-            //                        sf::Sprite sprite;
-            //                        sprite.setTexture(tlo1);
-            //                        //sprite.setScale(0.3, 0.3);
-            //                        sprite.setTextureRect(sf::IntRect(0, 0, 900, 900));
-            //                        wszystkieKsztalty.emplace_back(make_unique<sf::Sprite>(sprite));
 
             wczytajProstokaty(wszystkieKsztalty);
 
@@ -358,7 +377,7 @@ int main() {
             Macierz = usuwanieBloczkow(Macierz, COLUMNS, ROWS);
 
 
-            Macierz = opadanieBloczkow(Macierz, spadanieStop, COLUMNS, ROWS);
+            Macierz = opadanieBloczkow(Macierz, spadanieStop, ROWS, COLUMNS);
 
             // itercja kolorujaca plansze
             for (int i=0; i< COLUMNS; i++)
@@ -419,6 +438,7 @@ int main() {
                     }
                 }
             }
+
             liczbaPotworkow=licznik(Macierz, COLUMNS, ROWS);
             sf::Text potw(L"Zostalo ci jeszcze", czcionka, 30);
             potw.setPosition(580.f, 230.f);
@@ -664,8 +684,9 @@ void wczytajProstokaty(vector<unique_ptr<sf::Drawable> > &ksztalty)
 }
 
 Matrix opadanieBloczkow(Matrix& macierz, set<int> stop, int rows, int cols) {
-    for (int i = rows - 1; i > 0; i--) {
-        for (int j = 0; j < cols; j++) {
+    for (int i = 0; i < cols; i++) {
+        for (int j = rows - 1; j > 0; j--) {
+
             if (macierz[i][j] == 0 && stop.find(macierz[i][j-1]) != stop.end()) {
                 macierz[i][j] = macierz[i ][j-1];
                 macierz[i][j-1] = 0;
