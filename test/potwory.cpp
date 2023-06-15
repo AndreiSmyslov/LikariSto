@@ -8,7 +8,7 @@
 
 using namespace std;
 
-vector<sf::Vector3f> Potwory::pozycje;
+
 Potwory::Potwory(int liczba)
 {
     float ix;
@@ -62,4 +62,9 @@ vector<vector<int>> Potwory::DodajDoMacierzy(std::vector<std::vector<int>> mac)
         mac[poz.x][poz.y] = poz.z;
     }
     return mac;
+}
+
+void Potwory::wyczyscPozycje()
+{
+    pozycje.clear();
 }

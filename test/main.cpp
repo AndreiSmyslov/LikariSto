@@ -16,7 +16,7 @@ bool czyWygrany(int COLUMNS, int ROWS, Matrix Macierz);
 bool czyPrzegrany(Matrix Macierz);
 void wczytajProstokaty(vector<unique_ptr<sf::Drawable>> &ksztalty);
 int licznik(Matrix Macierz, int, int);
-void opadanieBloczkow(Matrix& macierz, set<int> stop, int rows, int cols);
+Matrix opadanieBloczkow(Matrix& macierz, set<int> stop, int rows, int cols);
 
 
 int main() {
@@ -71,6 +71,16 @@ int main() {
 
     // rectangle kwadratem będącym kratka na plaszy
     sf::RectangleShape rectangle(sf::Vector2f(CELL_SIZE*SCREEN_RESIZE-1, CELL_SIZE*SCREEN_RESIZE-1));
+
+    sf::Texture tloTexture;
+    if (!tloTexture.loadFromFile("tlo_main_gra_texture.png")) {
+        std::cerr << "Could not load texture" << std::endl;
+        return 1;
+    }
+    tloTexture.setRepeated(true);
+    sf::Sprite tloSprite;
+    tloSprite.setTexture(tloTexture);
+    tloSprite.setTextureRect(sf::IntRect(0, 0, 900, 900));
 
 
 
@@ -292,6 +302,7 @@ int main() {
 
         if(etapGry==2)
         {
+            window.draw(tloSprite);
 
             // generowanie nowego bloczka, ruch bloczka, dodanie go do Macierzy, gdy sie zatrzyma
             sf::Time czas = clock.getElapsedTime();
@@ -312,7 +323,7 @@ int main() {
             Macierz = usuwanieBloczkow(Macierz, COLUMNS, ROWS);
 
 
-            opadanieBloczkow(Macierz, spadanieStop, COLUMNS, ROWS);
+            Macierz = opadanieBloczkow(Macierz, spadanieStop, COLUMNS, ROWS);
 
             // itercja kolorujaca plansze
             for (int i=0; i< COLUMNS; i++)
@@ -608,7 +619,7 @@ void wczytajProstokaty(vector<unique_ptr<sf::Drawable> > &ksztalty)
     ksztalty.emplace_back(make_unique<sf::RectangleShape>(przyciskGraj));
 }
 
-void opadanieBloczkow(Matrix& macierz, set<int> stop, int rows, int cols) {
+Matrix opadanieBloczkow(Matrix& macierz, set<int> stop, int rows, int cols) {
     for (int i = rows - 1; i > 0; i--) {
         for (int j = 0; j < cols; j++) {
             if (macierz[i][j] == 0 && stop.find(macierz[i - 1][j]) != stop.end()) {
@@ -617,4 +628,5 @@ void opadanieBloczkow(Matrix& macierz, set<int> stop, int rows, int cols) {
             }
         }
     }
+    return macierz;
 }
