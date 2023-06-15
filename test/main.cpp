@@ -59,7 +59,7 @@ int main() {
 
 
     int poziomTrudnosci;
-    int liczbaGraczy;
+    int liczbaGraczy = 0;
 
     int liczbaPotworkow;
     int liczbaProb=0;
