@@ -201,3 +201,17 @@ void Bloczek::Pauza()
     else
         pauza=true;
 }
+
+void Bloczek::usun(std::vector<std::vector<int>> &macierz, int COLUMNS, int ROWS)
+{
+    numerTekstury1=0;
+    numerTekstury2=0;
+    macierz[pozycja][spadanie]=0;
+    for (int i=0; i< COLUMNS; i++)
+    {
+        for(int j=0; j < ROWS; j++)
+        {
+            macierz[i][j]=0;
+        }
+    }
+}
