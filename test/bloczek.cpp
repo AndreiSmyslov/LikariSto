@@ -60,6 +60,14 @@ bool Bloczek::wypelnijMacierz(std::vector<std::vector<int>> &macierz, int COLUMN
             }
             if(sposobSpadania==2)
             {
+                // To dodalem:
+                if(spadanie==14 && pozycja==0)
+                {
+                    spadanie=14;
+                    przesuwanie=false;
+                    return true;
+                }//
+
                 if((i == pozycja && j==spadanie))
                 {
                     macierz[i][j]=numerTekstury1;
