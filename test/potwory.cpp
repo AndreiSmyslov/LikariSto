@@ -24,7 +24,7 @@ Potwory::Potwory(int liczba)
     // Utworzenie rozkładu równomiernego dla indeksów
     // Przedział y nie jest od zera w celu ułatwienia rozgrywki
     uniform_int_distribution<> x(0,7);
-    uniform_int_distribution<> y(5,15);
+    uniform_int_distribution<> y(7,15);
     uniform_int_distribution<> z(1,3);
 
     for (int i = 0; i<liczba; i++)
